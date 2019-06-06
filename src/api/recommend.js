@@ -8,6 +8,8 @@ import axios from 'axios' // Promise based HTTP client for the browser and node.
  * @return: jsonp
  */
 // 因为每次抓取数据都会有很多重复的参数，所以单独用一个文件(同目录config.js)存起来，更方便
+
+// 获取轮播图数据
 export function getRecommend() {
   // ![jsonp data](https://i.loli.net/2019/04/06/5ca8638bac881.png) open in chrome, copy url(copy '?' before)
   const url =
@@ -25,14 +27,18 @@ export function getRecommend() {
  * Popular song list recommendation data
  * @returns {Promise.<TResult>|*}
  */
+// 获取歌单数据
 export function getDiscList() {
   // request back-end address that sends HTTP request to qq music get data
+  // const url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg';
+  // 这里就不是一个jsonp请求了，而是一个ajax请求了，因为我们在后端定义接口了
   const url = '/api/getDiscList'
   const data = Object.assign({}, commonParams, {
-    platform: 'yqq',
+    // picmid: 1,
+    platform: 'yqq.json',
     hostUin: 0,
     sin: 0,
-    ein: 29,
+    ein: 19,
     sortId: 5,
     needNewCode: 0,
     categoryId: 10000000,
@@ -40,11 +46,9 @@ export function getDiscList() {
     format: 'json'
   })
   // **webpack.dev.conf.js** invoked back-end interface
-  return axios
-    .get(url, {
+  return axios.get(url, {
       params: data
-    })
-    .then(res => {
+    }).then(res => {
       return Promise.resolve(res.data)
     })
 }

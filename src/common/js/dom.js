@@ -4,8 +4,11 @@
  * @param className
  * @returns {boolean}
  */
+// 判断当前元素是否有这个类，利用正则表达式
 export function hasClass(el, className) {
+  // 如果是以类名开头或者空白符后面跟着这个类名，类名后面是空白字符或者结束，，那么就代表有这个类名
   const reg = new RegExp('(^|\\s)' + className + '(\\s|$)')
+  // 通过正则检测是否含有这样格式的类名，有就返回true，没有就返回false
   return reg.test(el.className)
 }
 
@@ -13,8 +16,11 @@ export function addClass(el, className) {
   if (hasClass(el, className)) {
     return
   }
+  // 先通过' '分割成一个数组
   const newClass = el.className.split(' ')
+  // 把新的className添加进去
   newClass.push(className)
+  // 然后通过join，空格连起来
   el.className = newClass.join(' ')
 }
 
