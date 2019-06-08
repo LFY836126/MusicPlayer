@@ -6,7 +6,7 @@
       <li class="list-group" ref="listGroup" v-for="(group, index) in data" :key="index">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li class="list-group-item" v-for="(item, index) in group.items" :key="index" @click="selectItem(item)">
+          <li class="list-group-item" v-for="(item, index) in group.items" :key="index">
             <img class="avatar" v-lazy="item.avatar"/>
             <span class="name">{{item.name}}</span>
           </li>
@@ -81,10 +81,9 @@ export default {
     }
   },
   methods: {
-    // 向父元素传递此时被点击的是哪个元素
-    selectItem(item) {
-      this.$emit('select', item)
-    },
+//     selectItem(item) {
+//       this.$emit('select', item)
+//     },
     // 手指点击触发事件
     onShortCutTouchStart(e) {
       // 单独封装一个类getData(src/common/js/dom.js)实现索引的获取

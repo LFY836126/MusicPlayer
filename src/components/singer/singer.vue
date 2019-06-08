@@ -1,7 +1,8 @@
 <template>
   <div class="singer" ref="singer">
-    <list-view :data="singers" ref="list">
-    </list-view>
+    <!-- @select="selectSinger" 接受子组件传来的事件-->
+    <list-view :data="singers" ref="list" @select="selectSinger"></list-view>
+    <router-view></router-view>
   </div>
 </template>
 <script>
@@ -9,6 +10,7 @@ import { getSingerList } from 'api/singer'
 import { ERR_OK } from 'api/config'
 import Singer from 'common/js/singer'
 import ListView from 'base/listview/listview'
+import {mapMutations} from 'vuex'
 // 将前10条数据定义为热门数据
 const HOT_SINGER_LEN = 10
 // 定义title为热门
@@ -109,7 +111,17 @@ export default {
       })
       // 将数组拼接返回去，得到的也就是一个一维数组
       return hot.concat(ret)
-    }
+    },
+    selectSinger(singer) {
+      this.$router.push({ // route jump
+        path: `/singer/${singer.id}`
+      })
+      this.setSinger(singer)
+    },
+    // 经过这个映射，在代码中就可以调用this.setSinger
+    ...mapMutations({
+      setSinger: 'SET_SINGER'
+    })
   }
 }
 </script>

@@ -12,6 +12,7 @@ export function hasClass(el, className) {
   return reg.test(el.className)
 }
 
+// 给dom添加类名
 export function addClass(el, className) {
   if (hasClass(el, className)) {
     return
@@ -24,13 +25,14 @@ export function addClass(el, className) {
   el.className = newClass.join(' ')
 }
 
-// get & set index
+// get & set val
 export function getData(el, name, val) {
-  const prefix = 'data-'
+  const prefix = 'data-';
+  name = prefix + name;
   if (val) {
-    return el.setAttribute(prefix + name, val)
+    return el.setAttribute(name, val)
   }
-  return el.getAttribute(prefix + name)
+  return el.getAttribute(name)
 }
 
 // Configuration of different browser CSS

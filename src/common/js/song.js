@@ -1,6 +1,6 @@
-import { getLyric } from 'api/song' // lyric parse
-import { ERR_OK } from 'api/config'
-import { Base64 } from 'js-base64' // base64 解码
+// import { getLyric } from 'api/song' // lyric parse
+// import { ERR_OK } from 'api/config'
+// import { Base64 } from 'js-base64' // base64 解码
 
 // [Song](https://c.y.qq.com/v8/fcg-bin/fcg_v8_singer_track_cp.fcg?g_tk=5381&inCharset=utf-8&outCharset=utf-8&notice=0&format=jsonp&hostUin=0&needNewCode=0&platform=yqq&order=listen&begin=0&num=80&songstatus=1&singermid=0025NhlN2yWrP4&jsonpCallback=__jp1)
 export default class Song {
@@ -14,21 +14,21 @@ export default class Song {
     this.image = image
     this.url = url
   }
-  getLyric() { // api/song/getLyric()
-    if (this.lyric) {
-      return Promise.resolve(this.lyric)
-    }
-    return new Promise((resolve, reject) => {
-      getLyric(this.mid).then(res => {
-        if (res.retcode === ERR_OK) {
-          this.lyric = Base64.decode(res.lyric)
-          resolve(this.lyric)
-        } else {
-          reject(console.log('no lyric'))
-        }
-      })
-    })
-  }
+  // getLyric() { // api/song/getLyric()
+  //   if (this.lyric) {
+  //     return Promise.resolve(this.lyric)
+  //   }
+  //   return new Promise((resolve, reject) => {
+  //     getLyric(this.mid).then(res => {
+  //       if (res.retcode === ERR_OK) {
+  //         this.lyric = Base64.decode(res.lyric)
+  //         resolve(this.lyric)
+  //       } else {
+  //         reject(console.log('no lyric'))
+  //       }
+  //     })
+  //   })
+  // }
 }
 
 export function createSong(musicData) { // factory method
@@ -40,10 +40,11 @@ export function createSong(musicData) { // factory method
     album: musicData.albumname,
     duration: musicData.interval,
     image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
+    // 歌曲播放地址
     url: `http://isure.stream.qqmusic.qq.com/C100${musicData.songmid}.m4a?fromtag=32`
   })
 }
-
+// 因为一个歌曲可能有很多人唱，所以存储方式是数组形式，但是我们要将它转化为字符串形式显示
 function filterSinger(singer) { // some item have two singer
   const ret = []
   if (!singer) {

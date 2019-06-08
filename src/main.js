@@ -3,6 +3,7 @@ import fastclick from 'fastclick'
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import store from './store/vuex.js'
 import VueLazyload from 'vue-lazyload'
 // 这里的common就代表了src目录下的common，因为在webpack.base.conf.js中配置了如下选项
 //   resolve: {
@@ -18,5 +19,6 @@ fastclick.attach(document.body)
 new Vue({
   el: '#app',
   render: h => h(App),
-  router
+  router,
+  store
 })

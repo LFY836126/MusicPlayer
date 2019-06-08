@@ -18,6 +18,7 @@ export default {
       type: Boolean,
       default: true
     },
+    // 要不要监听滚动事件
     listenScroll: {
       type: Boolean,
       default: false
@@ -58,6 +59,10 @@ export default {
       })
       if (this.listenScroll) {
         const that = this
+        // 监听scroll的滚动事件，并且拿到位置，也就是事件的回调
+        // pos：手指往上滑，为负，越往上，负数的绝对值越大
+        // 手指向下滑，为正，越往下，正数的绝对值越大
+        // 回到最初的位置，pos为0
         this.scroll.on('scroll', pos => {
           that.$emit('scroll', pos)
         })

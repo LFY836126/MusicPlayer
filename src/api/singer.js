@@ -23,6 +23,7 @@ export function getSingerList() {
  * singer detail data
  * @param singerId
  */
+// 每个歌手有单独的id就是singerId，根据id抓取该歌手的信息
 export function getSingerDetail(singerId) {
   // ![singer detail interface](https://i.loli.net/2019/04/08/5caac3e8e7a0f.png)
   const url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_singer_track_cp.fcg'
