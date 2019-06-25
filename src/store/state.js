@@ -12,12 +12,18 @@ import { playMode } from 'common/js/config'
 
 const state = {
   singer: {},
-  // playing: false,
-  // fullScreen: false,
-  // playlist: [],
-  // sequenceList: [], // when play mode random, playlist !== sequenceList
-  // mode: playMode.sequence,
-  // currentIndex: -1,
+  // 播放状态，处于播放状态还是暂停状态
+  playing: false,
+  // 播放器的展开和收起
+  fullScreen: false,
+  // 因为可以实现切歌功能，所以一定有个播放列表
+  playlist: [],
+  // 顺序播放列表，当切换到顺序播放模式的时候播放这个列表
+  sequenceList: [], // when play mode random, playlist !== sequenceList
+  // 播放模式的切换
+  mode: playMode.sequence,
+  // 当前播放的是哪首歌的索引，
+  currentIndex: -1,
   // disc: {}, // song single object
   // topList: {}, // List interface jump interface: the list details interface.
   // searchHistory: loadSearch(), // loadSearch: Read from the local cache. search-list

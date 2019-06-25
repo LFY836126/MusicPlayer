@@ -7,7 +7,7 @@
 //  * @LastEditTime: 2019-04-10 10:10:16
 //  */
 
-// import * as types from './mutation-types'
+import * as types from './mutation-types'
 // import { playMode } from 'common/js/config'
 // import { shuffle } from 'common/js/util'
 // import {
@@ -36,8 +36,14 @@
 //  * @param {list, index} -> **music-list.vue** selectItem(item, index) {}
 //  * @return:
 //  */
-// export const selectPlay = function({ commit, state }, { list, index }) {
-//   commit(types.SET_SEQUENCE_LIST, list)
+
+// 当点击歌曲的时候，改变state中的几个属性，实现播放歌曲
+// 参数:两个对象：
+    // 第一个对象：一个commit方法和state中的属性
+    // 第二个对象：调用selectPlay中传入的参数，为了改变state中的部分属性值
+export const selectPlay = function({ commit, state }, { list, index }) {
+  commit(types.SET_SEQUENCE_LIST, list)
+  commit(types.SET_PLAYLIST, list)
 //   if (state.mode === playMode.random) {
 //     const randomList = shuffle(list)
 //     commit(types.SET_PLAYLIST, randomList)
@@ -45,10 +51,10 @@
 //   } else {
 //     commit(types.SET_PLAYLIST, list)
 //   }
-//   commit(types.SET_CURRENT_INDEX, index)
-//   commit(types.SET_FULL_SCREEN, true)
-//   commit(types.SET_PLAYING_STATE, true)
-// }
+  commit(types.SET_CURRENT_INDEX, index)
+  commit(types.SET_FULL_SCREEN, true)
+  commit(types.SET_PLAYING_STATE, true)
+}
 
 // /**
 //  * random play, no index

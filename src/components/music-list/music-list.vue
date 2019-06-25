@@ -43,7 +43,7 @@ import SongList from 'base/song-list/song-list'
 // 自动添加浏览器前缀
 import { prefixStyle } from 'common/js/dom'
 // import { playlistMixin } from 'common/js/mixin'
-// import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 const RESERVED_HEIGHT = 40
 // 这两个css属性需要判断在哪个浏览器下，进而确定添加哪个前缀
@@ -93,18 +93,19 @@ export default {
     this.$refs.list.$el.style.top = `${this.$refs.bgImage.clientHeight}px`
   },
   computed: { 
+    ...mapGetters(['currentIndex']),
     bgStyle() {
       return `background-image:url(${this.bgImage})`
     }
   },
   methods: {
-  //   ...mapActions(['selectPlay', 'randomPlay']),
-  //   handlePlaylist(playlist) {
-  //     const bottom = playlist.length > 0 ? '60px' : ''
-  //     this.$refs.list.$el.style.bottom = bottom
-  //     // console.log(this.$refs.list, '-----------')
-  //     this.$refs.list.refresh()
-  //   },
+    ...mapActions(['selectPlay', 'randomPlay']),
+    // handlePlaylist(playlist) {
+    //   const bottom = playlist.length > 0 ? '60px' : ''
+    //   this.$refs.list.$el.style.bottom = bottom
+    //   // console.log(this.$refs.list, '-----------')
+    //   this.$refs.list.refresh()
+    // },
     scroll(pos) {
       // 获取歌曲列表滚动的距离
       // pos：手指往上滑，为负，越往上，负数的绝对值越大
@@ -121,6 +122,7 @@ export default {
         list: this.songs,
         index
       })
+      console.log(this.currentIndex);
     },
   //   random() {
   //     this.randomPlay({

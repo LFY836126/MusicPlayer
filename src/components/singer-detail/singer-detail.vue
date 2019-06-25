@@ -10,7 +10,7 @@
 import { mapGetters } from 'vuex'
 import { getSingerDetail } from 'api/singer'
 import { ERR_OK } from 'api/config'
-import { createSong } from 'common/js/song'
+import { createSong , getMusic} from 'common/js/song'
 import MusicList from 'components/music-list/music-list'
 
 export default {
@@ -53,17 +53,34 @@ export default {
         })
       },
       // 将歌曲列表格式化，转化为我们需要的格式
+    // _normalizeSongs(list) {
+    //   const ret = []
+    //   list.forEach(item => {
+    // //     // [singer data](https://c.y.qq.com/v8/fcg-bin/fcg_v8_singer_track_cp.fcg?g_tk=5381&inCharset=utf-8&outCharset=utf-8&notice=0&format=jsonp&hostUin=0&needNewCode=0&platform=yqq&order=listen&begin=0&num=80&songstatus=1&singermid=0025NhlN2yWrP4&jsonpCallback=__jp1)
+    //     const { musicData } = item
+    //     if (musicData.songid && musicData.albummid) {
+    //       ret.push(createSong(musicData))
+    //     }
+    //   })
+    //   return ret
+    // },
     _normalizeSongs(list) {
-      const ret = []
-      list.forEach(item => {
-    //     // [singer data](https://c.y.qq.com/v8/fcg-bin/fcg_v8_singer_track_cp.fcg?g_tk=5381&inCharset=utf-8&outCharset=utf-8&notice=0&format=jsonp&hostUin=0&needNewCode=0&platform=yqq&order=listen&begin=0&num=80&songstatus=1&singermid=0025NhlN2yWrP4&jsonpCallback=__jp1)
-        const { musicData } = item
-        if (musicData.songid && musicData.albummid) {
-          ret.push(createSong(musicData))
-        }
-      })
-      // 返回所有格式化好的歌曲列表
-      return ret
+      let ret = []
+      list.forEach((item) => {
+        let {musicData} = item
+        if (musicData.songid && musicData.albummid) {
+          getMusic(musicData.songmid).then((res) => { // 这里需要先获取vkey
+            if (res.code === ERR_OK) {
+              const svkey = res.data.items
+              const songVkey = svkey[0].vkey
+              const newSong = createSong(musicData, songVkey) // 在这里把vkey和musicData传进去
+              ret.push(newSong)
+            }
+          })
+        }
+      })
+    // 返回所有格式化好的歌曲列表
+      return ret
     }
   }
 }

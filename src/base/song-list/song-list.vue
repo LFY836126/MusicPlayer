@@ -2,7 +2,7 @@
   <!-- ![singer detail interface](https://i.loli.net/2019/04/08/5caac3e8e7a0f.png) -->
   <div class="song-list">
     <ul>
-      <li class="item" v-for="(song, index) in songs" :key="index">
+      <li class="item" v-for="(song, index) in songs" @click="selectItem(song, index)" :key="index">
         <!-- <div class="rank" v-show="rank">
           <span :class="getRankCls(index)">{{getRankText(index)}}</span>
         </div> -->
@@ -28,9 +28,9 @@ export default {
     // }
   },
   methods: {
-    // selectItem(item, index) {
-    //   this.$emit('select', item, index)
-    // },
+    selectItem(item, index) {
+      this.$emit('select', item, index)
+    },
     getDesc(song) {
       return `${song.singer}·${song.album}`
     },
