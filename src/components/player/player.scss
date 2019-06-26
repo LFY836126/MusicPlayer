@@ -77,7 +77,7 @@
         .cd-wrapper {
           position: absolute;
           left: 10%;
-          top: 0;
+          top: 30%;
           width: 80%;
           height: 100%;
 
@@ -330,13 +330,13 @@
 
       .icon-play-mini, .icon-pause-mini, .icon-playlist {
         font-size: 30px;
-        color: $color-theme-d;
+        color: $color-theme-a;
       }
       .icon-mini {
         font-size: 32px;
         position: absolute;
-        right: 50;
-        top: 1;
+        right: 18%;
+        top: 27%;
       }
     }
   }

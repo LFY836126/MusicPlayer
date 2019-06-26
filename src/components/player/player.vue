@@ -74,7 +74,9 @@
             <!-- 当前歌曲播放时长 -->
             <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              <!-- <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar> -->
+              <!-- 进度条组件 -->
+              <!-- 用onProgressBarChange来接受子组件传来的函数percentChange -->
+              <progress-bar :percent="percent" @percentChange="onProgressBarChange"></progress-bar>
             </div>
             <!-- 当前歌曲总时长 -->
             <span class="time time-r">{{format(currentSong.duration)}}</span>
@@ -153,8 +155,9 @@ import { prefixStyle } from 'common/js/dom'
 // import { playMode } from 'common/js/config'
 // import { playerMixin } from 'common/js/mixin'
 import animations from 'create-keyframe-animation'
-// import ProgressBar from 'base/progress-bar/progress-bar'
-// import ProgressCircle from 'base/progress-circle/progress-circle'
+// 进度条
+import ProgressBar from 'base/progress-bar/progress-bar'
+import ProgressCircle from 'base/progress-circle/progress-circle'
 // import Lyric from 'lyric-parser'
 // import Scroll from 'base/scroll/scroll'
 // import Playlist from 'components/playlist/playlist'
@@ -163,12 +166,12 @@ const transform = prefixStyle('transform')
 // const transitionDuration = prefixStyle('transitionDuration')
 
 export default {
-  // components: {
-  //   ProgressBar,
-  //   ProgressCircle,
+  components: {
+    ProgressBar,
+    ProgressCircle,
   //   Scroll,
   //   Playlist
-  // },
+  },
   // mixins: [playerMixin],
   data() {
     return {
@@ -211,9 +214,10 @@ export default {
     disableCls() {
       return this.songReady ? '' : 'disable'
     },
-  //   percent() {
-  //     return this.currentTime / this.currentSong.duration
-  //   }
+    // 进度条的百分比
+    percent() {
+      return this.currentTime / this.currentSong.duration
+    }
   },
   methods: {
     ...mapMutations({
@@ -377,16 +381,18 @@ export default {
       }
       return num
     },
-  //   onProgressBarChange(percent) {
-  //     const currentTime = this.currentSong.duration * percent
-  //     this.$refs.audio.currentTime = currentTime
-  //     if (!this.playing) {
-  //       this.togglePlaying()
-  //     }
-  //     if (this.currentLyric) {
-  //       this.currentLyric.seek(currentTime * 1000)
-  //     }
-  //   },
+    onProgressBarChange(percent) {
+      const currentTime = this.currentSong.duration * percent
+      // 因为audio.currentTime是个可读写属性
+      this.$refs.audio.currentTime = currentTime
+      // 拖动完之后还要继续播放
+      if (!this.playing) {
+        this.togglePlaying()
+      }
+      // if (this.currentLyric) {
+      //   this.currentLyric.seek(currentTime * 1000)
+      // }
+    },
   //   getLyric() {
   //     this.currentSong
   //       .getLyric()
