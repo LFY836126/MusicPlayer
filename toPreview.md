@@ -632,7 +632,7 @@ package.json                ->添加了
               return this.playing ? 'play' : 'play pause'
              },
         ```
-    +　给样式填充数据
+    + 给样式填充数据
         ```
         填充数据
             1. 唱片图片:src="currentSong.image"
