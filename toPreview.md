@@ -609,7 +609,7 @@ package.json                ->添加了
             playlist.length > 0(src/components/player.vue)
             然后显示player.vue组件
         ```
-    +　播放器交互动画(src/components/player.vue)
+    + 播放器交互动画(src/components/player.vue)
         ```
         给播放器添加样式
         1. 样式1(player.vue)：当切换展开的播放器或者缩小的播放器时有动画效果，样式详见player.scss
