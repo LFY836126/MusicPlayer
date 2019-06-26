@@ -330,13 +330,16 @@
 
       .icon-play-mini, .icon-pause-mini, .icon-playlist {
         font-size: 30px;
-        color: $color-theme-a;
+        // color: $color-theme-a;
+        color: $color-theme-d;
       }
       .icon-mini {
         font-size: 32px;
         position: absolute;
-        right: 18%;
-        top: 27%;
+        // right: 18%;
+        // top: 27%;
+        left:0;
+        top:0
       }
     }
   }

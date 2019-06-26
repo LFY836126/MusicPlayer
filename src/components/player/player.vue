@@ -117,9 +117,9 @@
         <!-- 3.播放按钮 -->
         <div class="control">
           <!-- insert slot -->
-          <!-- <progress-circle :radius="radius" :percent="percent">-->
+          <progress-circle :radius="radius" :percent="percent">
             <i class="icon-mini" :class="miniIcon" @click.stop="togglePlaying"></i>
-          <!--</progress-circle> -->
+          </progress-circle>
         </div>
         <!-- 4.点开歌曲列表的按钮 --> 
         <div class="control">
@@ -177,7 +177,7 @@ export default {
     return {
       songReady: false,
       currentTime: 0,
-  //     radius: 32,
+      radius: 32,
   //     currentLyric: null,
   //     currentLineNum: 0, // lyrics highlight
   //     currentShow: 'cd', // disc interface and lyrics interface

@@ -1,5 +1,6 @@
 <template>
   <div class="progress-circle">
+    <!-- viewBox是视口的的大小 ，从0，0到100，100-->
     <svg
       :width="radius"
       :height="radius"
@@ -8,6 +9,8 @@
       xmlns="http://www.w3.org/2000/svg"
     >
       <!-- inner circle -->
+      <!-- 内层圆 -->
+      <!-- r="50" cx="50" cy="50"：圆的圆心和半径 -->
       <circle
         class="progress-background"
         r="50"
@@ -18,6 +21,7 @@
       <!-- outer circle can be rotated. -->
       <!-- stroke-dasharray: Stroke distance -->
       <!-- stroke-dashoffset: Stroke offset -->
+      <!-- 外层圆 -->
       <circle
         class="progress-bar"
         r="50"
@@ -27,6 +31,9 @@
         :stroke-dasharray="dashArray"
         :stroke-dashoffset="dashOffset"
       />
+      <!-- :stroke-dasharray="dashArray"：默认进度全部高亮
+      :stroke-dashoffset="dashOffset" ：我从圆圈尾开始往回偏移了多少，除了偏移的，剩下的就是高亮的部分
+      -->
     </svg>
     <!-- i Tag insertion slot -->
     <slot></slot>

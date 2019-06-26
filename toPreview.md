@@ -1,25 +1,54 @@
 ## 目录
 1. 所有目录
 ```
-src
-    api             ->放置和后端请求相关的代码，包括ajax等
-    base    
-        slider      ->轮播图组件
-    common          ->放置静态资源，像图片，字体等
-    components      ->公共组件
-        mHeader     ->首页顶部
-        tab         ->导航栏(歌手，排行等)
-
-    router          ->路由相关文件
-    store           ->vuex相关代码
-    main.js         ->入口相关文件
-    App.js          ->
-
-index.html          ->添加meta标签，移动端常见设置
-package.json        ->添加了
-                        ->"fastclick": "^1.0.6"：解决移动端点击300毫秒延迟
-                        ->"babel-runtime": "^6.26.0",:对es语法进行转义
-                        ->"babel-polyfill": "^6.26.0",对es6api进行转义，例如promise等
+src:
+    ├─api                   ->放置和后端请求相关的代码，包括ajax等
+    ├─base
+    │  ├─confirm
+    │  ├─listview
+    │  ├─loading
+    │  ├─no-result
+    │  ├─progress-bar
+    │  ├─progress-circle
+    │  ├─scroll
+    │  ├─search-box
+    │  ├─search-list
+    │  ├─slider             ->轮播图组件
+    │  ├─song-list
+    │  ├─switches
+    │  └─top-tip
+    ├─common                ->放置静态资源，像图片，字体等
+    │  ├─fonts
+    │  ├─image
+    │  ├─js
+    │  ├─scss
+    │  └─stylus
+    ├─components            ->公共组件
+    │  ├─add-song
+    │  ├─disc
+    │  ├─m-header           ->首页顶部
+    │  ├─music-list
+    │  ├─music-list.1
+    │  ├─player
+    │  ├─playlist
+    │  ├─rank
+    │  ├─recommend
+    │  ├─search
+    │  ├─singer
+    │  ├─singer-detail
+    │  ├─suggest
+    │  ├─tab                ->导航栏(歌手，排行等)
+    │  ├─top-list
+    │  └─user-center
+    ├─router                ->路由相关文件
+    ├─store                 ->vuex相关代码
+    ├─main.js               ->入口相关文件
+    └─App.vue
+index.html                  ->添加meta标签，移动端常见设置
+package.json                ->添加了
+                                ->"fastclick": "^1.0.6"：解决移动端点击300毫秒延迟
+                                ->"babel-runtime": "^6.26.0",:对es语法进行转义
+                                ->"babel-polyfill": "^6.26.0",对es6api进行转义，例如promise等
 ```
 
 ## 项目初始化
@@ -66,10 +95,10 @@ package.json        ->添加了
 5. 引入路由：
     + src/router/index.js
     + 引入并注册
-        ```
-            import Router from 'vue-router'
-            Vue.use(Router)
-        ```
+    ```
+        import Router from 'vue-router'
+        Vue.use(Router)
+    ```
     + 在src/main.js添加路由，并注册到实例身上
         ```
         import router from './router'
@@ -157,13 +186,13 @@ package.json        ->添加了
         ```
     + 编写轮播图js(见src/base/slider.vue,有详细注释)
     + 在slider.vue中使用better-scroll：
-        ```
-            官网：https://github.com/ustbhuangyi/better-scroll
-                https://ustbhuangyi.github.io/better-scroll/doc/zh-hans/
-            1. 引入：import BScroll from 'better-scroll'
-            2. 定义相关方法
-            3. 在生命周期函数mounted时候执行方法
-        ```
+    ```
+        官网：https://github.com/ustbhuangyi/better-scroll
+             https://ustbhuangyi.github.io/better-scroll/doc/zh-hans/
+        1. 引入：import BScroll from 'better-scroll'
+        2. 定义相关方法
+        3. 在生命周期函数mounted时候执行方法
+    ```
     + 轮播图整体功能：
         ```
         1. 设置每个子元素宽度，保证样式正确，获取整个轮播图的图片总宽度
@@ -549,3 +578,224 @@ package.json        ->添加了
                 <loading></loading>
             </div>
         ```
+18. 播放器页面src/components/player/player.vue
+    + 数据的存放：考虑多个组件都可以操作播放器，所以控制播放器的数据一定是个全局的，所以通过vuex来管理
+        ```
+        src/store/state.js              定义和组件相关的，最底层的数据
+        src/store/getter.js             对数据的映射，可以是一个函数，函数类似计算属性，根据state.js中的值计算出新的值
+        src/store/mutation-types.js     见代码，理清和mutations.js的关系
+        src/store/mutations.js          定义数据修改的逻辑，但是定义mutations之前，先定义mutation-types
+        ```
+    + 显示播放器组件的流程：src/components/player/player（见代码）
+        ```
+        1. 在app.vue下引用src/components/player/player
+            因为不是和路由相关的组件，切换到任何组件都不影响播放
+        2. 在app.vue下不能默认展示player.vue这个组件，要在src/components/player/player中引入vuex，
+            通过取vuex中的变量playlist,计算长度length，来控制player组件的显示，不能默认显示
+        3. 因为点击歌曲，下回触发这个组件，所以src/base/song.list组件要添加部分事件逻辑
+            当点击歌曲时候，触发事件selectItem，然后这个函数将触发的事件和当前歌曲索引传递给父组件src/music-list/music-list.vue
+            问：为什么传递索引呢，因为播放歌曲列表的时候，要从当前歌曲开始播放，所以要获取索引
+        4. 当点击歌曲列表的某首歌的时候要触发
+            (1)设置playlist和sequencelist
+            (2)根据点击的索引设置currentlist
+            (3)设置playing，设置歌曲播放还是暂停的状态，因为点击的时候，歌曲要播放，
+            (4)默认展开大的播放器，设置fullScreen
+            注意：因为要改变很多state，所以封装一个action(见src/store/action.js)
+        5. 因为要改变state，索引要使用action，所以要在src/components/music-list.vue中引入mapActions
+        6. 总结流程：
+            点击歌曲(src/base/song-list)
+            提交action(src/components/music-list)
+            提交mutation(src/store/action.js)修改state
+            playlist.length > 0(src/components/player.vue)
+            然后显示player.vue组件
+        ```
+    +　播放器交互动画(src/components/player.vue)
+        ```
+        给播放器添加样式
+        1. 样式1(player.vue)：当切换展开的播放器或者缩小的播放器时有动画效果，样式详见player.scss
+            (1)给展开的播放器添加transition样式为normal
+            (2)给缩小版的播放器添加transition样式为mini
+        2. 样式2 (player.vue)：当由缩小版的播放器切换为展开版的播放器时，左下的CD封面也会由小拉到大的 动画
+            (1)我们要通过js方式获取css动画，所以引入了create-keyframe-animation插件
+            因为设置动画需要获取参数，我们要定义的_getPosAndScale函数来获得相应参数
+            在enter中设置动画
+        3. 样式3(player.vue)：当由放大版的的播放器切换为缩的播放器时，CD封面从中间移到左下角的实现，不过没有样式2那种动画，是直接用js操作css样式实现的
+            因为设置动画需要获取参数，我们要定义的_getPosAndScale函数来获得相应参数
+            在leave中设置动画
+        4. 样式4(player.scss)：当别的页面切换为大的播放器页面的时候动画效果
+            效果1：背景有一个渐隐渐现的效果,纯利用transition和css3一起实现的
+            效果2：头部和底部又一个回弹的效果，这个效果是利用贝塞尔曲线cubic-bezier实现的
+        5. 点击播放后 大的，小的播放器实现CD封面旋转的样式
+            样式已经写好了.play,.pause.pause，在src/components/player/player.scss
+            <img class="image" :src="currentSong.image" :class="cdcls"/>
+             cdCls() {
+              return this.playing ? 'play' : 'play pause'
+             },
+        ```
+    +　给样式填充数据
+        ```
+        填充数据
+            1. 唱片图片:src="currentSong.image"
+            2. 歌曲名： v-html="currentSong.name"
+            3. 歌曲名称： v-html="currentSong.singer"
+        添加方法
+            1. 点击右上角的按钮实现返回：添加back方法，back方法中用Vuex的mutations设置fullScreen为false
+            2. 点击小型播放器后显示大的播放器：在小型播放器样式上绑定@click="open",open方法中设置fullScreen为true
+        ```
+    + 播放功能：利用html5的audio实现
+        ```
+        1. 添加audio标签，当currentSong改变时候play方法执行，但是遇到了问题，见下面问题的1,有具体解决方法
+        2. 设置歌曲播放和暂停：
+            (1)在class名为i-center的dom元素上绑定方法togglePlaying，切换暂停或者播放状态
+            (2)togglePlaying() { 
+                this.setPlayingState(!this.playing)
+                //setPlayingState: 获取更改state中playing的mutations方法
+                //playing:这个playing就是通过getters从vuex state获取的playing
+                }
+            (3)仅通过改变状态是不能控制歌曲的播放或者暂停的
+              我们可以watch这个playing，然后触发audio的play或者pause方法
+              但是因为我点击歌曲的时候，就会触发watch的playing属性
+              然后就会执行play，所以还是会出现问题1，解决方法也是一样
+            (4)播放或着暂停的圆圈圈样式改变
+                1. 添加计算属性
+                     playIcon() {
+                        return this.playing ? 'icon-pause' : 'icon-play'
+                     },
+                2. 添加样式<i :class="playIcon" @click="togglePlaying"></i>
+            (5)小的播放器图标的改变miniIcon 同理 大播放器
+                注意：当点击小的播放器播放按钮的时候，会产生冒泡事件，需要阻止冒泡事件
+                    <i class="icon-mini" :class="miniIcon" @click.stop="togglePlaying"></i>
+            (6)播放时候CD封面转圈，停止的时候CD封面停止
+                1. 给大的播放器CD绑定样式(小的同理)
+                    <div class="cd" :class="cdCls">
+                        <img class="image" :src="currentSong.image"/>
+                    </div>
+                2. 设置样式
+                    cdCls() {
+                      return this.playing ? 'play' : 'play pause'
+                    },
+        3. 点击播放下一首或者上一首歌曲
+            因为我们在state中记录了当前歌曲的索引，并且我们也有当前歌曲列表
+            所以向上或者向下只要改变索引就可以了
+            (1)给播放下一首歌曲按钮绑定事件(播放上一首歌曲按钮同理)
+                <div class="icon i-right">
+                  <i @click="next" class="icon-next"></i>
+                </div>
+            (2)事件逻辑
+                next() {
+                    let index = this.currentIndex + 1
+                    // 如果当前歌曲是最后一首歌
+                    if (index === this.playlist.length) {
+                      index = 0
+                    }
+                    this.setCurrentIndex(index)
+                  this.songReady = false
+                },
+        ```
+    + 大的播放器底部进度条src/base/progress-bar/progress-bar.vue：
+        ```
+        1.获取当前播放时间和总时间
+            (1)设置标签实现进度条<div class="progress-wrapper">
+            (2)因为当audio标签中歌曲播放的时候会派发一个事件就是@timeupdate="updateTime"
+            (3)updateTime(e) {
+              // update会传进来一个e的事件，这个事件有一个target属性就是audio标签
+              // 这个audio还有一个可以获取到当前播放时间的属性就是currenTime,
+              // 这个currentTime是一个时间戳的形式,是可读写属性
+              this.currentTime = e.target.currentTime // <audio> current time
+            },
+            (4)编写一个函数format，将currentTime格式化为分和秒的形式
+        2. 设置单独的组件显示进度条,接受父组件src/components/player/player.vue传过来的百分比的值
+            (1)根据百分比，求走过的距离，然后设置样式
+            (2)根据百分比，用transform设置小球的偏移
+        3. 拖拽或者点击，小球实现歌曲的实时播放
+        ```
+    + 小的播放器转圈圈的播放按钮src/base/progress-circle/progress-circle.vue：
+        ```
+        引入：import ProgressCircle from 'base/progress-circle/progress-circle'
+        注册：
+            components: {
+                ProgressCircle,
+            },
+        dom中使用
+              <progress-circle :radius="radius" :percent="percent">
+                <i class="icon-mini" :class="miniIcon" @click.stop="togglePlaying"></i>
+              </progress-circle>
+            这个i标签会在progress-circle组件中的slot标签中生效
+        progress-circle里面放置了两个circle，一个是默认全部高亮，一个是设置偏移量，剩下部分高亮
+        ```
+    + 播放模式
+        ```
+        
+        ```
+    + 遇到问题
+        ```
+        1. 当设置<audio ref="audio" :src="currentSong.url"></audio>
+            并且：
+            watch: {
+                currentSong(newSong, oldSong) { 
+                    this.$refs.audio.play()//只写这一句是会报错的
+                }
+            }
+            报错：The play() request was interrupted by a new request
+            原因：dom异常，这时候调用play时候，我们同时请求src是不可以的，这个dom还没有ready
+            解决：我们设置一个延迟
+                // 设置一个延迟
+                this.$nextTick(() => {
+                  this.$refs.audio.play()//只写这一句是会报错的
+                })
+        2. 获取播放源错误
+            解决：https://blog.csdn.net/a151913232/article/details/85034283
+        3. 点击按钮(播放上一首)后，发现歌曲虽然跳到了下一首，但是图标并没有，图标还是处于暂停状态
+        解决：在next方法下添加如下语句
+            if (!this.playing) {
+              this.togglePlaying()
+            }
+        4. 不停点击下一首那个按钮，会报问题1的错误(pre同理)
+            解决：查看audio官方文档，发现audio标签会派发两个事件，一个是canplay 和 error
+            (1)<audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error">
+            (2)所以根据这个，我们data中设置一个标志位，
+                data() {
+                    return {
+                      songReady: false,
+                      }
+                  }
+            (3)然后
+                ready() {
+                  this.songReady = true
+                  this.savePlayHistory(this.currentSong)
+                },
+            (4)然后next
+                next(){
+                    if (!this.songReady) {
+                        return
+                    }
+                    // 点击之后this.songReady = false,确保下一首歌曲准备好时 才可以点击
+                    this.songReady = false
+                }
+            (5)容错处理:当前歌曲播放不出来的话也可以实现点击下一首的功能
+                事件：
+                error(){
+                    this.songReady = true
+                }
+                样式也要体现：当 当前歌曲出错的时候，图标有一个变灰的样式
+                <div class="icon i-left" :class="disableCls">
+                  <i @click="pre" class="icon-prev" ></i>
+                </div>
+        5. 进度条的小球拖拽过程中，进度条会出现跳的情况
+            原因：当拖拽过程中，有两个事件改变进度条，
+                一个是拖拽事件，一个是歌曲播放事件
+                所以我们要设当拖拽过程中，拖拽事件权重更大一点
+            解决：if (newPercent >= 0 && !this.touch.init)
+                当没有拖拽事件的时候，才设置歌曲播放改变进度条
+        6. 当拖拽完之后，进度条虽然同步了，但是已播放秒数还是没有改变
+            拖拽完之后，重新计算进度条的百分比，然后改变audio的currentTime,然后进一步改变秒数 
+            progressTouchEnd() {
+              this._triggerPercent()
+            },
+            _triggerPercent() {
+              const progressBarWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
+              const percent = this.$refs.progress.clientWidth / progressBarWidth 
+              this.$emit('percentChange', percent)
+            },
+        ```
+    
