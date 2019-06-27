@@ -8,8 +8,8 @@
 //  */
 
 import * as types from './mutation-types'
-// import { playMode } from 'common/js/config'
-// import { shuffle } from 'common/js/util'
+import { playMode } from 'common/js/config'
+import { shuffle } from 'common/js/util'
 // import {
 //   saveSearch,
 //   clearSearch,
@@ -23,11 +23,11 @@ import * as types from './mutation-types'
 //  * this song in the list index
 //  * @return: randomlist song index
 //  */
-// function findIndex(list, song) {
-//   return list.findIndex(item => {
-//     return item.id === song.id
-//   })
-// }
+function findIndex(list, song) {
+  return list.findIndex(item => {
+    return item.id === song.id
+  })
+}
 
 // /**
 //  * Click on song-list to invoked
@@ -43,14 +43,14 @@ import * as types from './mutation-types'
     // 第二个对象：调用selectPlay中传入的参数，为了改变state中的部分属性值
 export const selectPlay = function({ commit, state }, { list, index }) {
   commit(types.SET_SEQUENCE_LIST, list)
-  commit(types.SET_PLAYLIST, list)
-//   if (state.mode === playMode.random) {
-//     const randomList = shuffle(list)
-//     commit(types.SET_PLAYLIST, randomList)
-//     index = findIndex(randomList, list[index]) // return song(list[index]) at randomList index
-//   } else {
-//     commit(types.SET_PLAYLIST, list)
-//   }
+  // commit(types.SET_PLAYLIST, list)
+  if (state.mode === playMode.random) {
+    const randomList = shuffle(list)
+    commit(types.SET_PLAYLIST, randomList)
+    index = findIndex(randomList, list[index]) // return song(list[index]) at randomList index
+  } else {
+    commit(types.SET_PLAYLIST, list)
+  }
   commit(types.SET_CURRENT_INDEX, index)
   commit(types.SET_FULL_SCREEN, true)
   commit(types.SET_PLAYING_STATE, true)
@@ -61,15 +61,17 @@ export const selectPlay = function({ commit, state }, { list, index }) {
 //  * @param {type}
 //  * @return:
 //  */
-// export const randomPlay = function({ commit }, { list }) {
-//   commit(types.SET_PLAY_MODE, playMode.random) // change playback mode become random mode
-//   commit(types.SET_SEQUENCE_LIST, list) // submit mutation, change the list of song sequences
-//   const randomList = shuffle(list)
-//   commit(types.SET_PLAYLIST, randomList) // change the playlist song
-//   commit(types.SET_CURRENT_INDEX, 0) // click on the current song index
-//   commit(types.SET_FULL_SCREEN, true) // change to full screen mode
-//   commit(types.SET_PLAYING_STATE, true) // change the current state of play
-// }
+export const randomPlay = function({ commit }, { list }) {
+  commit(types.SET_PLAY_MODE, playMode.random) // change playback mode become random mode
+  commit(types.SET_SEQUENCE_LIST, list) // submit mutation, change the list of song sequences
+  // 将list打乱
+  const randomList = shuffle(list)
+  commit(types.SET_PLAYLIST, randomList) // change the playlist song
+  // 从randomList的第一个开始播放就可以了
+  commit(types.SET_CURRENT_INDEX, 0) // click on the current song index
+  commit(types.SET_FULL_SCREEN, true) // change to full screen mode
+  commit(types.SET_PLAYING_STATE, true) // change the current state of play
+}
 
 // /**
 //  * Click on the search list song 1, Add to current playlist

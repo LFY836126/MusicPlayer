@@ -85,10 +85,13 @@ export default {
     },
     // 点击进度条
     progressClick(e) {
-      // const rect = this.$refs.progressBar.getBoundingClientRect() // getBoundingClientRect: **static/getBoundingClientRect.png**
-      // const offsetWidth = e.pageX - rect.left // offsetWidth: real progress = stop position - rect
-      // this._offset(offsetWidth)
-      this._offset(e.offsetX)
+      // 进度条到左边屏幕边缘的距离
+      const rect = this.$refs.progressBar.getBoundingClientRect() // getBoundingClientRect: **static/getBoundingClientRect.png**
+      // e.pageX：当前点击位置 到屏幕左边的距离，但是这里计算的：还要再减去进度条到左边的距离
+      const offsetWidth = e.pageX - rect.left // offsetWidth: real progress = stop position - rect
+      this._offset(offsetWidth)
+      // this._offset(e.offsetX) //出错
+      // 计算当前进度条的百分比，并且传递给父组件
       this._triggerPercent()
     },
     // 设置偏移距离

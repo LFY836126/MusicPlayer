@@ -111,9 +111,9 @@ export default {
       const anchorIndex = parseInt(this.touch.anchorIndex) + delta // stop position index
       this._scrollTo(anchorIndex)
     },
-//     refresh() {
-//       this.$refs.listview.refresh()
-//     },
+    refresh() {
+      this.$refs.listview.refresh()
+    },
 
 // 将私有方法放在下面，将公共方法放在上面
     scroll(pos) {

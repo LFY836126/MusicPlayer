@@ -9,6 +9,7 @@
 import { getSingerList } from 'api/singer'
 import { ERR_OK } from 'api/config'
 import Singer from 'common/js/singer'
+import { playlistMixin } from 'common/js/mixin'
 import ListView from 'base/listview/listview'
 import {mapMutations} from 'vuex'
 // 将前10条数据定义为热门数据
@@ -16,6 +17,7 @@ const HOT_SINGER_LEN = 10
 // 定义title为热门
 const HOT_NAME = '热门'
 export default {
+  mixins: [playlistMixin],
   data() {
     return {
       singers: []
@@ -28,6 +30,13 @@ export default {
     this._getSingerList() // get singer data
   },
   methods:{
+    handlePlaylist(playlist) {
+      // 当playlist中有数据的时候，就将滚动组件的bottom设置为60px
+      const bottom = playlist.length > 0 ? '60px' : ''
+      this.$refs.singer.style.bottom = bottom
+      // console.log(this.$refs.list, '-----------')
+      this.$refs.list.refresh()
+    },
      _getSingerList() {
       getSingerList().then(res => {
         if (res.code === ERR_OK) {

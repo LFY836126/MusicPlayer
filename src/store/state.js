@@ -18,7 +18,7 @@ const state = {
   fullScreen: false,
   // 因为可以实现切歌功能，所以一定有个播放列表
   playlist: [],
-  // 顺序播放列表，当切换到顺序播放模式的时候播放这个列表
+  // 所有歌曲播放列表，当切换到顺序播放模式的时候播放这个列表
   sequenceList: [], // when play mode random, playlist !== sequenceList
   // 播放模式的切换
   mode: playMode.sequence,

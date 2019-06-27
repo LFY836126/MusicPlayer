@@ -10,7 +10,8 @@
 import { mapGetters } from 'vuex'
 import { getSingerDetail } from 'api/singer'
 import { ERR_OK } from 'api/config'
-import { createSong , getMusic} from 'common/js/song'
+import { createSong } from 'common/js/song'
+import { getMusic } from 'api/song'
 import MusicList from 'components/music-list/music-list'
 
 export default {
@@ -23,7 +24,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['singer']),
+    ...mapGetters(['singer', 'playing', 'fullScreen',' playlist','sequenceList','mode','currentIndex','currentSong']),
     title() {
       return this.singer.name
     },
@@ -64,7 +65,7 @@ export default {
     //   })
     //   return ret
     // },
-    _normalizeSongs(list) {
+   _normalizeSongs(list) {
       let ret = []
       list.forEach((item) => {
         let {musicData} = item
@@ -74,12 +75,13 @@ export default {
               const svkey = res.data.items
               const songVkey = svkey[0].vkey
               const newSong = createSong(musicData, songVkey) // 在这里把vkey和musicData传进去
+              // console.log(this.currentSong, this.singer, this.playing, this.fullScreen, this.playlist, this.sequenceList, this.mode, this.currentIndex, this.currentSong);
               ret.push(newSong)
+              // console.log(this.currentSong, this.singer, this.playing, this.fullScreen, this.playlist, this.sequenceList, this.mode, this.currentIndex, this.currentSong);
             }
           })
         }
       })
-    // 返回所有格式化好的歌曲列表
       return ret
     }
   }

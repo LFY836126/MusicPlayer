@@ -108,6 +108,9 @@
         }
 
         .playing-lyric-wrapper {
+          position:absolute;
+          left:10%;
+          top:150%;
           width: 80%;
           margin: 30px auto 0 auto;
           overflow: hidden;

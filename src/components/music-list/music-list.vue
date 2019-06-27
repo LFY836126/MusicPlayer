@@ -14,6 +14,7 @@
           class="play"
           ref="playBtn"
           v-show="songs.length>0"
+          @click="random"
         >
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
@@ -42,8 +43,8 @@ import SongList from 'base/song-list/song-list'
 
 // 自动添加浏览器前缀
 import { prefixStyle } from 'common/js/dom'
-// import { playlistMixin } from 'common/js/mixin'
-import { mapActions, mapGetters } from 'vuex'
+import { playlistMixin } from 'common/js/mixin'
+import { mapActions } from 'vuex'
 
 const RESERVED_HEIGHT = 40
 // 这两个css属性需要判断在哪个浏览器下，进而确定添加哪个前缀
@@ -51,7 +52,7 @@ const transform = prefixStyle('transform')
 const backdrop = prefixStyle('backdrop-filter')
 
 export default {
-  // mixins: [playlistMixin],
+  mixins: [playlistMixin],
   components: {
     Scroll,
     Loading,
@@ -93,19 +94,19 @@ export default {
     this.$refs.list.$el.style.top = `${this.$refs.bgImage.clientHeight}px`
   },
   computed: { 
-    ...mapGetters(['currentIndex']),
     bgStyle() {
       return `background-image:url(${this.bgImage})`
     }
   },
   methods: {
     ...mapActions(['selectPlay', 'randomPlay']),
-    // handlePlaylist(playlist) {
-    //   const bottom = playlist.length > 0 ? '60px' : ''
-    //   this.$refs.list.$el.style.bottom = bottom
-    //   // console.log(this.$refs.list, '-----------')
-    //   this.$refs.list.refresh()
-    // },
+    handlePlaylist(playlist) {
+      // 当playlist中有数据的时候，就将滚动组件的bottom设置为60px
+      const bottom = playlist.length > 0 ? '60px' : ''
+      this.$refs.list.$el.style.bottom = bottom
+      // console.log(this.$refs.list, '-----------')
+      this.$refs.list.refresh()
+    },
     scroll(pos) {
       // 获取歌曲列表滚动的距离
       // pos：手指往上滑，为负，越往上，负数的绝对值越大
@@ -122,13 +123,13 @@ export default {
         list: this.songs,
         index
       })
-      console.log(this.currentIndex);
+      // console.log(this.currentIndex);
     },
-  //   random() {
-  //     this.randomPlay({
-  //       list: this.songs
-  //     })
-  //   }
+    random() {
+      this.randomPlay({
+        list: this.songs
+      })
+    }
   },
   watch: {
     scrollY(newVal) {

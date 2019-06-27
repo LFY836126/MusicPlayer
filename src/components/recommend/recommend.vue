@@ -51,7 +51,9 @@ import Slider from 'base/slider/slider'
 import Loading from 'base/loading/loading'
 import { getRecommend, getDiscList } from 'api/recommend'
 import { ERR_OK } from 'api/config'
+import { playlistMixin } from 'common/js/mixin'
 export default {
+  mixins: [playlistMixin],
   data(){
     return{
       recommends: [],
@@ -71,6 +73,13 @@ export default {
     this._getDiscList() //异步获取歌单数据
   },
   methods:{
+    handlePlaylist(playlist) {
+      // 当playlist中有数据的时候，就将滚动组件的bottom设置为60px
+      const bottom = playlist.length > 0 ? '60px' : ''
+      this.$refs.recommend.style.bottom = bottom
+      // console.log(this.$refs.list, '-----------')
+      this.$refs.scroll.refresh()
+    },
     _getRecommend(){
       getRecommend().then((res) => {
         if(res.code == ERR_OK){
