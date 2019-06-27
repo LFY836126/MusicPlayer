@@ -24,7 +24,7 @@ const state = {
   mode: playMode.sequence,
   // 当前播放的是哪首歌的索引，
   currentIndex: -1,
-  // disc: {}, // song single object
+  disc: {}, // song single object
   // topList: {}, // List interface jump interface: the list details interface.
   // searchHistory: loadSearch(), // loadSearch: Read from the local cache. search-list
   // playHistory: loadPlay(), // loadPlay: Read the search history from the local cache.

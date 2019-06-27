@@ -27,7 +27,7 @@ export function getRecommend() {
  * Popular song list recommendation data
  * @returns {Promise.<TResult>|*}
  */
-// 获取歌单数据
+// 获取全部歌单数据
 export function getDiscList() {
   // request back-end address that sends HTTP request to qq music get data
   // const url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg';
@@ -52,7 +52,7 @@ export function getDiscList() {
       return Promise.resolve(res.data)
     })
 }
-
+// 抓取每个歌单的全部数据
 export function getSongList(disstid) {
   const url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg'
   /* const url = 'https://c.y.qq.com/qzone/fcgi-bin/fcg_ucc_getcdinfo_byids_cp.fcg' */

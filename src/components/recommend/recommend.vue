@@ -24,7 +24,7 @@
             <!-- .item :
             flex布局，实现左边图片和右边文字的布局，还有利用align-items: center;实现水平居中
             右边文字的上下也使用了flex布局，还有flex-direction: column;和 justify-content: center;-->
-            <li class="item" v-for="item in discList" :key="item.dissid">
+            <li class="item" v-for="item in discList" :key="item.dissid" @click="selectItem(item)">
               <div class="icon">
                 <!-- v-lazy: when scroll then load -->
                 <img width="60" height="60" v-lazy="item.imgurl"/>
@@ -52,6 +52,7 @@ import Loading from 'base/loading/loading'
 import { getRecommend, getDiscList } from 'api/recommend'
 import { ERR_OK } from 'api/config'
 import { playlistMixin } from 'common/js/mixin'
+import { mapMutations } from 'vuex'
 export default {
   mixins: [playlistMixin],
   data(){
@@ -80,6 +81,14 @@ export default {
       // console.log(this.$refs.list, '-----------')
       this.$refs.scroll.refresh()
     },
+    // 点击li，带参数的路由跳转
+    selectItem(item) {
+      this.$router.push({
+        path: `/recommend/${item.dissid}`
+      })
+      // 并且将点击的歌单传入vuex中
+      this.setDisc(item)
+    },
     _getRecommend(){
       getRecommend().then((res) => {
         if(res.code == ERR_OK){
@@ -104,6 +113,9 @@ export default {
         this.$refs.scroll.refresh() // better-scroll: dom change, refresh
       }
     },
+    ...mapMutations({
+      setDisc: 'SET_DISC'
+    }),
   }
 }
 </script>
