@@ -691,6 +691,16 @@ package.json                ->添加了
                     this.setCurrentIndex(index)
                   this.songReady = false
                 },
+        4. 当歌曲播放到末尾实现自动切换
+            因为audio并没有切换割去这样的功能，但是歌曲播放完了，会派发一个ended的事件，所以我们可以利用end自己实现
+        5. 随机播放全部按钮实现事件交互src/components/music-list.vue
+            1. 给按钮绑定事件：random
+                random() {
+                  this.randomPlay({
+                    list: this.songs
+                  })
+                }
+            2. 整个randomPlay是从action.js(src/store/action.js)中获取的，可以更改state中playList(当前播放歌曲列表)的action
         ```
     + 大的播放器底部进度条src/base/progress-bar/progress-bar.vue：
         ```
@@ -725,7 +735,116 @@ package.json                ->添加了
         ```
     + 播放模式
         ```
-        
+        1. 样式的改变：
+            从state中引入mode变量，根据mode给dom结构增加样式，
+            点击切换模式时，引入mutations改变mode
+        2. 播放列表的改变
+            (1)如果是随即播放，需要将列表打乱，也就是洗牌，那么封装一个函数(src/common/js/util.js)完成洗牌
+            (2)引入setPlayList:'SET_PLAY_LIST',为了改变当前播放列表
+                如果是随机播放则将打乱(shuffle函数)的歌曲列表赋给playList
+                如果不是随机播放，那么playList就等于sequenceList
+            (3)因为当前歌曲是根据歌曲列表和索引设置的，所以如果歌曲列表改变的话，
+                当前播放的歌曲也可能发生变化，所以我们要重新计算currentIndex
+                resetCurrentIndex(list){
+                  let index = list.findIndex((item) => {
+                    return item.id == this.currentSong.id
+                  })
+                  this.setCurrentIndex = index;
+                }
+        ```
+    + 歌词(大部分在src/components/player.vue中完成)
+        ```
+        1. 获取歌词数据
+            (1)定义获取歌词数据接口src/api/song.js
+            (2)在webpack.dev.conf.js中定义路由api/lyric，因为在src/api/song.js中是通过api/lyric来获取数据的
+                注意：因为得到的好像还是一个jsonp形式的数据，所以我们这里要做一个小小的处理
+            (3)在src/common/js/song.js中调用getLyric,把歌词和歌曲的其他数据都封装在一个song对象中，因为他们都是歌曲整个整体的一部分
+            (4)需要将数据解码，所以利用插件base64
+                src/common/js/song.js中引入import { Base64 } from 'js-base64'
+               将得到的lyric解码
+                this.lyric = Base64.decode(res.lyric)
+            (5)因为得到的是各一个很长的字符串，我们需要转化为我们需要的格式，所以引入插件lyric-parser
+                引入：import Lyric from 'lyric-parser'
+                将歌词格式化,并且设置处理函数(this.handleLyric)：
+                this.currentSong.getLyric().then(lyric => {
+                  this.currentLyric = new Lyric(lyric, this.handleLyric)
+                })
+        2. 设置歌词高亮
+            (1) 因为当歌词每一行发生"改变"时，会触发this.handleLyric这个方法，
+                因为我们解析到的歌词是有很多数据的，包括每行歌词的开始时间，
+                所以说这里的改变是指随着时间改变，歌词的改变
+                这个方法handleLyric({ lineNum, txt }) 传入两个参数
+                    // lineNum：当前行
+                    // txt：当前行的歌词
+            (2)设置一个变量记录当前行this.currentLineNum
+                    this.currentLineNum = lineNum
+            (3)在dom中遍历并显示所有歌词，如果遍历到的歌词等于当前行歌词，那就设置样式高亮显示
+                <p 
+                    v-for="(line,index) in currentLyric.lines" 
+                    :key="index" 
+                    :class="{'current': currentLineNum === index}"
+                >
+                {{line.txt}}
+                </p>
+        3. 设置歌词可以滚动
+            引入scroll组件，然后传入数据:data="currentLyric && currentLyric.lines"
+            传入数据目的就是确保歌词数据存在，并且当歌词数据改变的时候调用scroll的refresh方法
+        4. 保证当前歌词总在中间的位置上
+            handleLyric({ lineNum, txt }) {
+              this.currentLineNum = lineNum
+              if (lineNum > 5) {
+                const lineEl = this.$refs.lyricLine[lineNum - 5]
+                // 滚动到指定行，时间为1秒
+                this.$refs.lyricList.scrollToElement(lineEl, 1000)
+              } else {
+                // 滚动到指定位置，时间为1秒
+                this.$refs.lyricList.scrollTo(0, 0, 1000)
+              }
+              // this.playingLyric = txt
+            },
+        5. 歌词和唱片左右滑动效果
+            (1)先设置左右滑动的时候，底部小圆圈的样式
+                <span class="dot" :class="{'active':currentShow==='cd'}"></span>
+                <span class="dot" :class="{'active':currentShow==='lyric'}"></span>
+            (2)CD页面，往左滑时候，歌词列表页面可以滚过来，然后CD页面有渐隐的效果
+                先绑定事件，设定变量
+                    在.middle"上绑定三个事件
+                        @touchstart.prevent="middleTouchStart"
+                        @touchmove.prevent="middleTouchMove"
+                        @touchend="middleTouchEnd"
+                    设置变量touch = {},关联touchdown和touchmove
+                事件逻辑：就那三个函数，自己看吧，我是没看懂
+                    包括：左滑右滑dom元素位置的变化 offsetWidth
+                          中间动画的效果           duration
+                          dom元素渐隐渐现的的效果   opcity
+        6. 当拖动进度条的时候，歌词部分高亮部分也要相应改变
+            // 歌曲拖动的时候，歌词高亮部分也相应改变
+            onProgressBarChange(percent) {
+                if (this.currentLyric) {
+                    // currentTime：是秒形式的
+                    this.currentLyric.seek(currentTime * 1000)
+                }
+              }
+        7. 在CD封面下面会显示当前歌词这一行
+            创建显示结构
+                <div class="playing-lyric-wrapper">
+                  <div class="playing-lyric">{{playingLyric}}</div>
+                </div>
+            当歌词改变时候，给playingLyric赋值
+                handleLyric({ lineNum, txt }) {
+                    this.playingLyric = txt
+                }
+        8. 收尾
+        (1)当获取不到歌词，做容错处理
+                 this.currentSong.getLyric().then(lyric => {
+                    ......
+            })
+            // 当获取不到歌词的时候，变量都清空
+            .catch(() => {
+              this.currentLyric = null
+              this.playingLyric = ''
+              this.currentLineNum = 0
+            })
         ```
     + 遇到问题
         ```
@@ -737,7 +856,7 @@ package.json                ->添加了
                 }
             }
             报错：The play() request was interrupted by a new request
-            原因：dom异常，这时候调用play时候，我们同时请求src是不可以的，这个dom还没有ready
+            原因：dom异常，这时候调用play时候，我们同时请求src是不可以的，这个dom还没有ready 
             解决：我们设置一个延迟
                 // 设置一个延迟
                 this.$nextTick(() => {
@@ -797,5 +916,66 @@ package.json                ->添加了
               const percent = this.$refs.progress.clientWidth / progressBarWidth 
               this.$emit('percentChange', percent)
             },
+        7. 我把歌曲暂停了之后，点击切换播放模式,会发生歌曲还是继续播放的情况
+            原因：当我切换播放模式之后，因为重新计算歌曲index，也算是改变了currentSong，
+            所以就会被watch监听到，就会继续播放歌曲
+            解决:
+            watch: {
+                currentSong(newSong, oldSong) {
+                    if (newSong.id === oldSong.id) {
+                        currentSong.id no change currentSong no change
+                        return
+                    }
+                    this.$nextTick(() => {
+                        this.$refs.audio.play()
+                      })
+                    },
+                }
+            }
+        8. 当我点击随机播放了之后，再去点击歌曲列表，就会出现，点击的歌曲和实际播放的歌曲不一样
+            原因：当我点击随机播放全部了之后，此时playList列表已经变为了随机播放列表，
+            原本是顺序列表的时候，playList和currentIndex确定了当前播放的歌曲，
+            但是现在playList已经变为了随机播放列表，所以不能获取到正确的歌曲
+        9. 当切换很多歌曲的时候，会出现高亮部分一直在跳
+            原因：开启了多个计时器，没有关掉
+            当监听到currentSong改变了之后，我们要关掉当前歌词的计时器
+        10. 当歌曲暂停的时候歌词并没有暂停，还在继续走
+            解决：
+                当togglePlaying的时候，将歌词也暂停
+                if (this.currentLyric) { 
+                    this.currentLyric.togglePlay()
+                }
+        11. 循环播放的时候，歌曲播放完了，歌词并没有回到最开始
+            解决： 
+                loop() {
+                  if (this.currentLyric) {
+                    // 将歌词偏移到最开始
+                    this.currentLyric.seek(0) // <audio>, song jump to begin
+                  }
+                },
+        12. 当只获取到一首歌的时候index = 0，我们点击next时候，下面这行语句执行
+            let index = this.currentIndex + 1       //index = 1
+            if (index === this.playlist.length) {
+              index = 0                             //index = 0
+            }
+            也就是index的值并没有变，所以，watch监听到的currentSong也没变，也就是往后的语句都不会执行
+            解决：在next()和prev()上加个逻辑判断，当只获取到一首歌的时候，调用loop函数，转为单曲循环模式
+        13. 当程序在微信端运行的时候，js是不执行的，所以audio只会把当前歌曲播放完，之后就不执行了
+            // 不用$nextTick，而是用setTimeout，这样就保证了我们微信从后台切到前台的时候，我们的歌曲又可以重新播放了
+            setTimeout(() => {
+                this.$refs.audio.play()//只写这一句是会报错的，因为调用play时候，我们同时请求src是不可以的，这个dom还没有ready
+                this.getLyric()
+              }, 1000)
+        14. 问题·：底部mini播放器会占据正常播放列表页面最后一行
+                    就比如说，薛之谦所有音乐，最后一个是"演员"，
+                    整个mini播放器就会把演员列表那一行遮挡
+            解决：将解决问题的逻辑封装成一个单独的文件src/common/js/mixin.js
+                    关于mixin：https://www.jianshu.com/p/f34863f2eb6d
+            思路：当playlist中有数据的时候，就将滚动组件的bottom设置为60px
+            具体实现见：
+                src/common/js/mixin.js
+                src/components/music-list
+                src/components/singer
+                src/base/listview
+                src/components/recommend
         ```
-    
