@@ -19,8 +19,8 @@ export const currentIndex = state => state.currentIndex
 export const currentSong = state => { // song forward backward
   return state.playlist[state.currentIndex] || {}
 }
-// export const disc = state => state.disc
-// export const topList = state => state.topList
+export const disc = state => state.disc
+export const topList = state => state.topList
 // export const searchHistory = state => state.searchHistory
 // export const playHistory = state => state.playHistory
 // export const favoriteList = state => state.favoriteList

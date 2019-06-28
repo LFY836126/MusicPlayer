@@ -33,6 +33,7 @@ export default class Song {
     })
   }
 }
+// 获取歌曲的歌手，播放源等数据
 export function createSong(musicData, songVkey) { // factory method
   // return new Song({
   //   id: musicData.songid,
@@ -53,7 +54,24 @@ export function createSong(musicData, songVkey) { // factory method
       album: musicData.albumname,
       duration: musicData.interval,
       image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
-    url: `http://dl.stream.qqmusic.qq.com/C400${musicData.songmid}.m4a?vkey=${songVkey}&guid=6442406400&uin=0&fromtag=66`
+    url: `http://isure.stream.qqmusic.qq.com/C400${musicData.songmid}.m4a?guid=1327051764&vkey=${songVkey}&uin=1843&fromtag=66`
+    // http://isure.stream.qqmusic.qq.com/C400001apXAh2mHRub.m4a?guid=1327051764&vkey=E18EDC7044EAC5837F607FFF824CE09D760E44693958597D4B338EC06EE3250A8542A46128441841AB336E3169B5D4B164B5BB02E7143546&uin=1843&fromtag=66
+    })
+
+}
+
+// 获取歌曲的歌手，播放源等数据
+export function createSongOne(item, songVkey) { // factory method
+  return new Song({
+      id: item.songid,
+      mid: item.songmid,
+      singer: filterSinger(item.singer),
+      name: item.songname,
+      album: item.albumname,
+      duration: item.interval,
+      image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${item.albummid}.jpg?max_age=2592000`,
+    url: `http://isure.stream.qqmusic.qq.com/C400${item.songmid}.m4a?guid=1327051764&vkey=${songVkey}&uin=1843&fromtag=66`
+    // http://isure.stream.qqmusic.qq.com/C400001apXAh2mHRub.m4a?guid=1327051764&vkey=E18EDC7044EAC5837F607FFF824CE09D760E44693958597D4B338EC06EE3250A8542A46128441841AB336E3169B5D4B164B5BB02E7143546&uin=1843&fromtag=66
     })
 
 }

@@ -3,9 +3,10 @@
   <div class="song-list">
     <ul>
       <li class="item" v-for="(song, index) in songs" @click="selectItem(song, index)" :key="index">
-        <!-- <div class="rank" v-show="rank">
+      <!-- 设置排行榜的排行样式 -->
+        <div class="rank" v-show="rank">
           <span :class="getRankCls(index)">{{getRankText(index)}}</span>
-        </div> -->
+        </div>
         <div class="content">
           <h2 class="name">{{song.name}}</h2>
           <p class="desc">{{getDesc(song)}}</p>
@@ -22,10 +23,11 @@ export default {
       type: Array,
       default: null
     },
-    // rank: {
-    //   type: Boolean,
-    //   default: false
-    // }
+    // 默认rank为false，代表默认没有排行的样式
+    rank: {
+      type: Boolean,
+      default: false
+    }
   },
   methods: {
     selectItem(item, index) {
@@ -34,18 +36,22 @@ export default {
     getDesc(song) {
       return `${song.singer}·${song.album}`
     },
-    // getRankCls(index) {
-    //   if (index <= 2) {
-    //     return `icon icon${index}`
-    //   } else {
-    //     return 'text'
-    //   }
-    // },
-    // getRankText(index) {
-    //   if (index > 2) {
-    //     return index + 1
-    //   }
-    // }
+    // 和排行榜有关的样式
+    getRankCls(index) {
+      // 前三名，是图片的样式
+      if (index <= 2) {
+        // 在scss文件中有对应的样式
+        return `icon icon${index}`
+      } else {
+        // 否则就是文字样式，文字的实现在getRankText(index)中
+        return 'text'
+      }
+    },
+    getRankText(index) {
+      if (index > 2) {
+        return index + 1
+      }
+    }
   }
 }
 </script>

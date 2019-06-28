@@ -62,6 +62,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             console.log(e)
           })
       })
+      // 获取vkey
       app.get('/api/music', function(req, res) {
         var url = 'https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg'  
         axios.get(url, {
@@ -110,6 +111,31 @@ const devWebpackConfig = merge(baseWebpackConfig, {
               }
             }
             res.json(ret)
+          })
+          .catch((e) => {
+            console.log(e)
+          })
+      })
+      
+      app.get('/api/getSongList', (req, res) => {
+        var url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg'
+        // Send an HTTP request
+        axios
+          .get(url, {
+            // The request to cheat qq
+            headers: {
+              referer: 'https://c.y.qq.com/',
+              host: 'c.y.qq.com'
+            },
+            // params, (recommend.js/getDiscList) pass to url address
+            // params: req.query：获取浏览器请求这个接口传进来的参数
+            params: req.query
+          })
+          .then((response) => {
+            // res: to font-end
+            // response.data: qq response data
+            // 将qq接口返回的response，返回我们定义接口的res(接口的返回数据)中
+            res.json(response.data)
           })
           .catch((e) => {
             console.log(e)

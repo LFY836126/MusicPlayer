@@ -43,6 +43,7 @@
         <loading></loading>
       </div>
     </scroll>
+    <router-view></router-view>
   </div>
 </template>
 <script>
@@ -87,7 +88,9 @@ export default {
         path: `/recommend/${item.dissid}`
       })
       // 并且将点击的歌单传入vuex中
+      // console.log('click')
       this.setDisc(item)
+      // console.log('click')
     },
     _getRecommend(){
       getRecommend().then((res) => {

@@ -6,6 +6,7 @@ import Rank from 'components/rank/rank'
 import Search from 'components/search/search'
 import SingerDetail from 'components/singer-detail/singer-detail'
 import Disc from 'components/disc/disc'
+import TopList from 'components/top-list/top-list'
 Vue.use(Router) 
 
 export default new Router({
@@ -16,8 +17,8 @@ export default new Router({
         component: Recommend,
         children: [
           {
-            path:':id', 
-            component:Disc
+            path: ':id', 
+            component: Disc,
           }
         ]
       },
@@ -32,7 +33,17 @@ export default new Router({
           }
         ]
       },
-      {path: '/rank', component: Rank},
+      {
+        path: '/rank', 
+        component: Rank,
+        children: [
+          {
+          // 以id为变量，可以传入不同的id值，然后去渲染不同的歌手详情页
+          path: ':id',
+          component: TopList,
+          }
+        ]
+      },
       {path: '/search', component:Search},
   ]
 })

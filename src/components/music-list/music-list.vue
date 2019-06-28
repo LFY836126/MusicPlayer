@@ -26,7 +26,7 @@
     <!-- 这里把songs传入scroll中是为了正确计算滚动区域高度 -->
     <scroll :data="songs" class="list" ref="list" :listen-scroll="listenScroll" :probe-type="probeType" @scroll="scroll">
       <!-- <div class="song-list-wrapper"> -->
-        <song-list :songs="songs" @select="selectItem">
+        <song-list :songs="songs" @select="selectItem" :rank="rank">
         </song-list>
       <!-- </div> -->
       <div v-show="!songs.length" class="loading-container">
@@ -71,10 +71,11 @@ export default {
       type: String,
       default: ''
     },
-    // rank: {
-    //   type: Boolean,
-    //   default: false
-    // }
+    // 歌曲列表是否显示排名
+    rank: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     return {

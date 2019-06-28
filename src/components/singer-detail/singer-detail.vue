@@ -74,6 +74,7 @@ export default {
             if (res.code === ERR_OK) {
               const svkey = res.data.items
               const songVkey = svkey[0].vkey
+              console.log(songVkey);
               const newSong = createSong(musicData, songVkey) // 在这里把vkey和musicData传进去
               // console.log(this.currentSong, this.singer, this.playing, this.fullScreen, this.playlist, this.sequenceList, this.mode, this.currentIndex, this.currentSong);
               ret.push(newSong)
