@@ -5,16 +5,16 @@ src:
     ├─api                   ->放置和后端请求相关的代码，包括ajax等
     ├─base
     │  ├─confirm
-    │  ├─listview
-    │  ├─loading
+    │  ├─listview           ->歌手列表的核心组件(singer中使用)
+    │  ├─loading            ->等待数据加载时显示的组件(就是一个转圈圈的图案)
     │  ├─no-result
-    │  ├─progress-bar
-    │  ├─progress-circle
-    │  ├─scroll
+    │  ├─progress-bar       ->播放器页面的进度条
+    │  ├─progress-circle    ->mini播放器的播放按钮
+    │  ├─scroll             ->用于给组件实现滚动
     │  ├─search-box
     │  ├─search-list
     │  ├─slider             ->轮播图组件
-    │  ├─song-list
+    │  ├─song-list          ->只用于显示所有歌曲(只要获取歌曲就需要这个组件)
     │  ├─switches
     │  └─top-tip
     ├─common                ->放置静态资源，像图片，字体等
@@ -25,17 +25,17 @@ src:
     │  └─stylus
     ├─components            ->公共组件
     │  ├─add-song
-    │  ├─disc
+    │  ├─disc               ->歌单详情页
     │  ├─m-header           ->首页顶部
-    │  ├─music-list
-    │  ├─music-list.1
-    │  ├─player
-    │  ├─playlist
+    │  ├─music-list         ->歌手详情页主要组件(在singer-detail中被使用)
+    │  
+    │  ├─player             ->播放器页面(大的播放器，mini播放器)
+    │  ├─playlist       
     │  ├─rank
-    │  ├─recommend
+    │  ├─recommend          ->歌单页面
     │  ├─search
-    │  ├─singer
-    │  ├─singer-detail
+    │  ├─singer             ->所有歌手列表页(引用listview)
+    │  ├─singer-detail      ->歌手详情页(引用music-list)
     │  ├─suggest
     │  ├─tab                ->导航栏(歌手，排行等)
     │  ├─top-list
@@ -969,13 +969,406 @@ package.json                ->添加了
         14. 问题·：底部mini播放器会占据正常播放列表页面最后一行
                     就比如说，薛之谦所有音乐，最后一个是"演员"，
                     整个mini播放器就会把演员列表那一行遮挡
-            解决：将解决问题的逻辑封装成一个单独的文件src/common/js/mixin.js
+              解决：将解决问题的逻辑封装成一个单独的文件src/common/js/mixin.js
                     关于mixin：https://www.jianshu.com/p/f34863f2eb6d
             思路：当playlist中有数据的时候，就将滚动组件的bottom设置为60px
+            实现三部曲：
+                先引入：import { playlistMixin } from 'common/js/mixin'
+                再注册：export default {
+                            mixins: [playlistMixin],
+                        }
+                实现handlePlaylist方法
             具体实现见：
                 src/common/js/mixin.js
                 src/components/music-list
                 src/components/singer
                 src/base/listview
                 src/components/recommend
+        ```
+20. 歌单详情页src/components/disc.vue(类似歌手详情页)
+    + 这是一个二级路由，定义在router/index.js的recommend的children中，然后在recommend.vue中引入路由组件router-view
+    + 点击歌单路由跳转：src/components/recommend.vue
+        ```
+        1. 点击li触发@click="selectItem(item)" selectItem(item)
+        2. // 点击li，带参数的路由跳转
+            selectItem(item) {
+                this.$router.push({
+                    path: `/recommend/${item.dissid}`
+                })
+            }
+        ```
+    + 歌单部分数据的存放和获取
+        ```
+        1. 在vuex中的state，mutations，mutations-type中都设置有关歌单的变量
+        2. src/components/recommend.vue中
+            引入mutations
+                在src/components/recommend.vue中利用this.setDisc(item)将vuex中的disc值设置为当前点击的li
+                然后利用getters得到
+           src/components/disc.vue中
+            引入getters
+                从vuex中获取当前歌单的标题，背景图等，传入到music-list组件中
+        ```
+    + 从qq音乐抓取每个歌单全部歌曲
+        ```
+        1. 在build/webpack.dev.conf.js中配置获取所有歌曲的接口，更改referer和host
+        2. 在src/api/recommend.js中定义获取全部歌曲的方法getSongList，调用接口/api/getSongList
+        2. 在src/components/disc.vue中使用该方法
+            getSongList(this.disc.dissid).then(res => {
+                if (res.code === ERR_OK) {
+                  this.songs = this._normalizeSongs(res.cdlist[0].songlist)
+                }
+              })
+        3. 获取到songs之后，将songs传入到子组件music-list
+        ```
+    + 小问题：
+        ```
+        当刷新了之后，暂时获取不到数据，不能一直在这个页面等着，所以设置跳转到父组件
+        _getSongList() {
+            if (!this.disc.dissid) {
+                this.$router.push('/recommend')
+                return
+            }
+        },
+        ```
+21. 所有排行榜页面src/components/rank/rank.vue
+    + 抓取数据src/api/rank.js(rank.vue中有具体实现，一看应该就能懂)
+    + 在页面内获取数据并使用(rank.vue中有具体实现，一看应该就能懂)
+    + 设置组件可以滚动(rank.vue中有具体实现，一看应该就能懂)
+        ```
+        需要把数据传递给scroll，当数据全部存在时候，才能正确判断可滑动部分的高度
+        ```
+    + 数据未加载时候，显示一个转圈圈的图标loading
+    + 当底部有mini播放器占位的时候，需要处理底部高度：使用mixin.js
+        ```
+        ```
+22. 对于数据获取的总结：
+    + json
+        ```
+        如果获取数据的接口要求传入的的参数中format:json,那么就用axios配合更改referer和host的方式
+        先在webpack.dev.conf.js中
+            定义接口改变referer和host，
+            并且 获取来自 请求这个接口时 传过来的数据，
+            然后再从qq音乐上获取数据
+            由src/api/....js文件中的方法取得最终获取的数据
+        ```
+    + jsonp
+        ```
+        直接在src/api下的js文件中定义获取数据方法
+        然后通过jsonp将所有请求数据连在一起 并请求网页
+        然后src/api/js文件中的方法 中得到jsonp取得的数据
+        ```
+    + 使用，如果需要获取播放源的，需要先引入获取vkey的函数，在获取歌曲
+23. 排行榜详情页面src/components/top-list.vue(和disc.vue很像很像)
+    + 路由
+        ```
+        1. 编写路由：
+            是一个二级路由，在route.js中的rank下面定义
+            children: [
+              {
+              // 以id为变量，可以传入不同的id值，然后去渲染不同的歌手详情页
+              path: ':id',
+              component: TopList,
+              }
+            ]
+        2. 跳转路由src/components/rank/rank.vue
+            给遍历排行榜的li添加点击事件@click="selectItem(item)"
+            selectItem(item) {
+              this.$router.push({
+                path: `/rank/${item.id}`
+              })
+              this.setTopList(item)
+            },
+        3. 添加<router-view></router-view>
+        ```
+    + 关于排行榜内的所有歌曲数据
+        ```
+        1. 在src/api/rank.js中获取数据
+        2. src/components/top-list下使用数据
+        ```
+    + 将获取的song传进music-list，然后设置没有数据时候(this.$route.push)默认返回上一级父元素
+    + 设置榜单样式src/base/song-list.vue
+        ```
+        1. 设置变量，默认rank为false，代表默认没有排行的样式
+            props: {
+                rank: {
+                  type: Boolean,
+                  default: false
+                }
+            }
+        2. 设置事件改变样式，当排行在前三名时显示图片，往后显示数字
+        3. 因为是top-list引入music-list，然后music-list中引用song-list，所以由top-list传入rank的值，覆盖默认值
+        ```
+24. 搜索页面src/components/search.vue
+    + 搜索框组件src/base/search-box.vue(在src/components/search.vue中引用)
+        ```
+        1. 默认搜索框中的内容是"搜索歌曲、歌手",但是可以更改，所以在src/base/search-box.vue设置
+                <input ref="query" class="box" :placeholder="placeholder"/>
+                props: {
+                    placeholder: {
+                      type: String,
+                      default: '搜索歌曲、歌手'
+                    }
+                },
+        2. 获取来自搜索框中输入的内容
+            <input ref="query" class="box" :placeholder="placeholder" v-model="query"/>
+            data() {
+                // 获取来自输入搜索框中的内容，利用双线绑定v-model
+                return {
+                  query: ''
+                }
+            },
+        3. 通过是否输入内容，控制输入框后面的"×"图标是否显示，当输入内容不为空的时候才显示
+            <i class="icon-dismiss" v-show="query"></i>
+        4. 点击×图标的时候，输入框中的内容为空
+            <i class="icon-dismiss" v-show="query" @click="clear"></i>
+            clear() {
+              this.query = ''
+            },
+        5. 监听query的改变，传递给父元素
+            created() {
+                // 这种写法和直接在下面写watch差不多
+                this.$watch(
+                  'query',
+                  debounce(newQuery => {
+                    this.$emit('query', newQuery)
+                  }, 200)
+                )
+            },
+        ```
+    + 热门搜索
+        ```
+        1. 数据：
+            获取数据：因为不是jsonp方式，见22标题
+            使用数据，在src/components/search.vue中调用方法getHotKey
+                1). 引入import { getHotKey } from 'api/search'
+                2). 在created时调用
+                    created() {
+                        this._getHotKey()
+                    },
+                3). this._getHotKey
+                    _getHotKey() {
+                      getHotKey().then(res => {
+                        if (res.code === ERR_OK) {
+                          this.hotKey = res.data.hotkey.slice(0, 10)
+                        }
+                      })
+                    }
+                4). 将hotkey数据填入到dom结构                  中
+                    <li class="item" v-for="(item,index) in hotKey" :key="index">
+                        <span>{{item.k}}</span>
+                    </li>
+        2. 逻辑
+            点击热门搜索的数据，可以自动将数据填充到搜索框中
+                在src/base/search-box中设置改变query的方法
+                在父组件src/components/search中，
+                    //query为 当前点击的 热门搜索中的内容
+                this.$refs.searchBox.setQuery(query)
+            当搜索框中有关键词的时候，应该显示一个搜索结果的列表见src/components/suggest.vue
+        ```
+    + 搜索组件(当点击搜索框中内容不为空的时候，显示搜索列表)
+    src/components/suggest.vue
+        ```
+        1. 获取数据
+            (1)search: 用于获取数据
+            (2)_genResult:将获取到的数据格式化，得到我们想要的格式
+                如果根据检索词返回数据中zhida的值不为空，那么说明检索到了包含检索词的歌手
+                将zhida中的内容加上type:singer键值对形成一个新的对象加入到ret中
+                再将所有和检索词有关的歌曲放入到ret中
+        2. 遍历数据
+             <li class="suggest-item" v-for="(item,index) in result" :key="index">
+        3. 设置样式，因为歌手和歌曲显示的图标和文字都是不一样的
+            <div class="icon">
+                <!-- 图标是动态的，也就是歌手和歌曲显示的图标是不一样的-->
+              <i :class="getIconCls(item)"></i>
+            </div>
+            <div class="name">
+                <!-- 歌手与歌曲显示的数据也是不一样的 -->
+              <p class="text" v-html="getDisplayName(item)"></p>
+            </div>
+        4. 总体思路：
+            在src/components/search.vue中引入组件
+                src/base/SearchBox：负责搜索框的内容
+                src/components/Suggest：  负责根据搜索框中内容的查找相关歌曲或者歌手
+            逻辑：在searchbox组件中，监听搜索框中内改变，然后将改变的值传递给父组件search组件
+                父组件接受事件，并将query的值传递给子组件suggest.vue
+                suggest.vue子组件监听到query的改变，调用search方法从qq音乐福端请求数据
+        5. 优化：将根据检索词返回的数据中的res.data.song.list格式化
+           利用common/js/song.js中的createSong处理
+                this._normalizeSongs(data.song.list)：
+                _normalizeSongs(list) { // filter
+                  const ret = []
+                  list.forEach(musicData => {
+                    if (musicData.songid && musicData.albummid) {
+                      ret.push(createSong(musicData))
+                    }
+                  })
+                  return ret
+                },
+        6. 搜索列表实现滚动功能
+            引入scroll组件
+        7. 上拉刷新功能(扩展scroll组件)（视频：10-5:17:30）
+            (1)
+               src/base/scroll.vue
+               props: {
+                    // 是否开启上拉刷新功能，默认是false
+                    pullup: {
+                      type: Boolean,
+                      default: false
+                    },
+                }
+            (2)
+                在scroll组件初始化的时候，判断是否开启了上拉刷新该功能
+                如果开启了，监听scrollEnd事件，就是当停止滚动的时候派发一个scrollEnd事件
+                如果此时滚动到了底部，那就向父组件派发一个事件，代表父元素可以进行上拉刷新功能了
+                    if (this.pullup) { // pullup: drop-down refresh
+                            // scrollEnd:停止滚动了
+                            // scrollToEnd:滚动到底部了
+                        this.scroll.on('scrollEnd', () => {
+                            //当满足这个条件的时候，表示当前已经滚动到底部了
+                          if (this.scroll.y <= this.scroll.maxScrollY + 50) {
+                            this.$emit('scrollToEnd') 
+                          }
+                        })
+                  }
+             (3)
+              当滚动到底部，scroll向父组件派发事件，父组件接收事件，并触发searchMore方法
+              <scroll :pullup="pullup" @scrol`lToEnd="searchMore">
+              //上拉刷新
+              searchMore() {
+                  // 如果此时数据已经加载完了，就不能实现上拉刷新的功能了
+                  // _checkMore来检测是否数据都请求完毕，也就是是否改变hasMore
+                  if (!this.hasMore) {
+                    return
+                  }
+                  this.page++
+                    // 刷新一次，page++,再请求page对应页数的数据
+                  search(this.query, this.page, this.showSinger, perpage).then(res => {
+                    if (res.code === ERR_OK) {
+                      this.result = this.result.concat(this._genResult(res.data))
+                      this._checkMore(res.data)
+                    }
+                  })
+                },
+            (4)当刷新时候显示转圈圈的样式，
+                引入loading组件：import Loading from 'base/loading/loading'
+                loading显示的条件是hasmore为true
+                改变hasMore的条件是
+                if(!song.list.length || song.curnum + (song.curpage) * perpage > song.totalnum){
+                    this.hasMore = false
+                }
+            (5)当滑动到页面底部的时候，scroll给父组件传递事件
+                父组件调用searchMore方法处理获取下一页的数据
+                也就是请求数据时候，将page++传递过去
+                每次请求，获取数据之后都判断一下是否数据都请求完毕:_checkMore(){}
+            (6)优化
+                search() {
+                    // query改变的时候，第一次调用search，page都要从第一个开始
+                    this.page = 1
+                    // query改变的时候，第一次调用search，都要滚动到底部
+                    this.$refs.suggest.scrollTo(0, 0)
+                }
+        8. 点击搜索到的内容，跳转相应页面
+            (1)对搜索列表中歌手的点击：
+                设置路由：当搜索内容含有歌手的时候，跳转路由，跳到歌手详情页
+                当点击click搜索列表的时候，绑定selectItem事件
+                如果点击的是歌手，那么跳转路由，并且设置vuex中singer的值改变
+                 if (item.type === TYPE_SINGER) {
+                    this.$router.push({
+                      path: `/search/${singer.id}`
+                    })
+                    //调用mutations改变vuex中state中的值
+                    //...mapMutations({
+                    //  setSinger: 'SET_SINGER'
+                    //}),
+                    this.setSinger(singer)
+                }
+            (2)对搜索列表中歌曲的点击：
+                如果点击歌曲，state中的playlist和sequencelist和currentIndex这三个变量都要改变
+                else{
+                    this.insertSong(item)
+                }
+                所以我们要在action中进行一个封装，见src/store/action.js的insertSong
+                注意，点击歌曲要：
+                    1. 歌曲播放
+                    2. playlist和sequenceList中要添加歌曲
+                        还要判断之前有没有这首歌，如果有
+                        还要判断这首歌在currentSong的前面还是后面，以便调用不用的删除方
+                        只保留当前新添加的歌曲(位置)
+            (3)出现问题：报什么do not mutate vuex store state outside mutations......
+            原因：在actions中
+                let playlist = state.playlist
+                后来直接操作playlist是不行
+            解决：let playlist = state.playlist.slice()
+            currentIndex就不会报这个错，因为基本数据类型是值传递
+        9. 优化： 
+            (1)当搜索列表为空的时候，显示相应的组件src/base/no-result.vue
+            (2)每输入一个字符都会派发一个事件，但是我们不想派发这么频繁，所以在src/base/search-box中进行更改
+            (3)移动端，输入搜索内容的时候，会调起键盘，当搜索结束后不会收起键盘
+                逻辑：监听到滚动事件，input失去焦点，键盘收起
+                由scroll.vue组件在滚动前(beforeScroll)派发事件
+                由suggest.vue组件接受来自scroll组件的事件，并传递给父组件search
+                由search接收来自suggest组件的事件，并调用search-box中的事件来使search-box中的搜索框失去焦点，
+        ```
+    + 搜索历史
+        ```
+        1. 数据的存取因为很多地方都用到了搜索历史，所以我们将他保存到全局的vuex中
+            state,mutation-type, mutations
+        2. 在suggest中点击搜索；列表，派发事件(因为每个组件都实现特定的功能，实现功能分离)
+        3. 要将结果缓存到localStorage中，所以封装一个单独的js文件src/common/js/cache.js，专门操作localStorage
+            需要安装插件good-storage操作localStorage
+            因为localStroage存储数据格式什么的很麻烦，这个插件封装了一下，操作简单
+            具体见src/common/js/cache.js的saveSearch方法
+            saveSearch
+                将搜索历史列表存入到localStorage
+                将搜索历史列表返回给vuex
+            在我们刷新页面之后，搜索历史就不见了
+            因为我们在vuex中state最初设置searchHistory为[]，所以搜索历史刷新之后就不见了，
+            解决：searchHistory最初就从localStorage中拿，具体见src/common/js/cache.js的loadSearch方法和store/state.js
+        4. 总逻辑：当点击搜索列表的时候，suggest向父组件search传递当前被点击元素item
+                调用actions，将query加入到搜索历史中
+                由actions调用commit方法将的新的数组提交给mutations，
+                mutations将最终的数组存到vuex中
+        5. 将vuex中的搜索历史 数据渲染到dom上
+            取数据：mapGetters
+            引用组件 search-list
+            因为很多地方都要用显示列表的组件，所以单独封装一个组件src/base/search-list
+            当需要显示列表的时候，引入并将列表数据传给组件，就可以了
+        6. 当点击搜索历史中的数据的时候，要进行搜索
+            在search-list组件中，绑定点击事件，向父元素search传当前点击的item
+            父组件search接受子组件search-list传来的事件，并且触发addQuery事件，完成逻辑
+        7. 当点击搜索历史中数据后面的×的时候，将该条历史删除，或者点击垃圾桶，清空历史
+            和存储搜索历史差不多
+            点击×：  
+                由search-list派发事件给父组件search
+                由search处理事件，调用actions中的deleteSearchHistory方法
+                在actions封装方法deleteSearchHistory
+                deleteSearchHistory方法中调用cache.js中的deleteSearch方法
+                经过deleteSearch后，将处理过的数组重新赋给vuex state中的searchHistory
+            点击垃圾桶图标：
+                点击时，触发事件actions中的clearSearchHistory方法
+                在actions封装方法clearSearchHistory
+                clearSearchHistory方法中调用cache.js中的clearSearch方法
+                经过clearSearch后，将处理过的数组重新赋给vuex state中的searchHistory   
+        8. 优化：点击垃圾桶时候，有一个弹出的框提醒用户是否全部删除
+            (1)弹框组件：src/base/confirm
+                当点击清空按钮的时候，触发的不是清空历史的操作了，是显示弹窗的操作
+                然后当点击弹窗中的确定或者取消的时候，confirm会触发响应的事件
+                事件中定义：弹窗的隐藏，和向父组件传递当前点击的是确定还是取消操作
+            (2)当搜索历史有点多的时候，设置滚动事件
+                给热门搜索和搜索历史加上滚动事件
+                因为它们两个是两个div，所以我们应该在最外层添加一个div
+                否则scroll默认是第一个div添加滚动事件，
+                还有就是数据的问题，我们不能只监听一个div数据的改变，所以设置计算属性
+                shortcut()
+                    {
+                        return this.hotKey.concat(this.searchHistory)
+                    }
+                问题：当已经搜索歌曲 高度在屏幕大小的边缘的时候，再添加一首的话不出现滚动情况
+                因为什么这个时候，dom是在搜索结果页面，而不是在search页面
+                所以要加一个逻辑，在search中watch  query的改变，
+                    因为在组件切换的过程中，query有一个从有到无的状态，
+                    所以如果newquery为空的话，手动刷新scroll
+            (3)当歌曲播放的时候，也就是最下方的mini播放器显示的时候，要重新计算搜索列表的高度
+                mixin配合handlePlaylist
+                见search组件
         ```
