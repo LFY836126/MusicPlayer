@@ -8,6 +8,7 @@
         :key="item"
         @click="selectItem(item)"
       >
+      <!-- @click.stop：因为整个icon是上面li的子元素，所以要stop -->
         <span class="text">{{item}}</span>
         <span class="icon" @click.stop="deleteOne(item)">
           <i class="icon-delete"></i>

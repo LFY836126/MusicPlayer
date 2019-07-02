@@ -10,14 +10,15 @@
 import * as types from './mutation-types'
 import { playMode } from 'common/js/config'
 import { shuffle } from 'common/js/util'
-// import {
-//   saveSearch,
-//   clearSearch,
-//   deleteSearch,
-//   savePlay,
-//   saveFavorite,
-//   deleteFavorite
-// } from 'common/js/cache'
+// import { saveSearch,deleteSearchHistory } from 'common/js/cache.js'
+import {
+  saveSearch,
+  clearSearch,
+  deleteSearch,
+  savePlay,
+  saveFavorite,
+  deleteFavorite
+} from 'common/js/cache'
 
 // /**
 //  * this song in the list index
@@ -125,20 +126,21 @@ export const insertSong = function({ commit, state }, song) {
   commit(types.SET_PLAYING_STATE, true)
 }
 
+// 点击歌曲，将歌曲添加到搜索历史中
 // // Save to localStorage, saveSearch(call cache.js)
 export const saveSearchHistory = function({ commit }, query) {
   commit(types.SET_SEARCH_HISTORY, saveSearch(query))
 }
-
+// 删除搜索历史中的一条
 // // Remove the search term from localStorage, deleteSearch(call cache.js)
-// export const deleteSearchHistory = function({ commit }, query) {
-//   commit(types.SET_SEARCH_HISTORY, deleteSearch(query))
-// }
-
+export const deleteSearchHistory = function({ commit }, query) {
+  commit(types.SET_SEARCH_HISTORY, deleteSearch(query))
+}
+// 清空搜索历史
 // // clearSearch: cache.js Clean cache, clearSearch(call cache.js)
-// export const clearSearchHistory = function({ commit }) {
-//   commit(types.SET_SEARCH_HISTORY, clearSearch())
-// }
+export const clearSearchHistory = function({ commit }) {
+  commit(types.SET_SEARCH_HISTORY, clearSearch())
+}
 
 // export const deleteSong = function({ commit, state }, song) {
 //   const playlist = state.playlist.slice()

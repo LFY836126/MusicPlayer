@@ -13,13 +13,12 @@
       ref="shortcutWrapper"
        v-show="!query"
     >
-      <!-- <scroll
+      <scroll
         class="shortcut"
         ref="shortcut"
         :data="shortcut"
-      > -->
-      <div>
-        <div class="shortcut">
+      >
+        <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
             <ul>
@@ -35,42 +34,41 @@
               </li>
             </ul>
           </div>
-          <!-- <div class="search-history" v-show="searchHistory.length">
+          <div class="search-history" v-show="searchHistory.length">
             <h1 class="title">
               <span class="text">搜索历史</span>
+              <!-- @click="showConfirm" -->
               <span class="clear" @click="showConfirm">
                 <i class="icon-clear"></i>
               </span>
             </h1>
+            <!-- 通过组件显示列表 -->
+            <!-- @delete="deleteSearchHistory"
+               -->
             <search-list
               :searches="searchHistory"
-              @delete="deleteSearchHistory"
               @select="addQuery"
+              @delete="deleteOne"
             >
             </search-list>
-          </div> -->
+          </div> 
         </div>
-      </div>
-      <!-- </scroll> -->
+      </scroll>
     </div>
-    <!-- 
     <div
       class="search-result"
       v-show="query"
       ref="searchResult"
     >
-      -->
-      <!-- @listScroll="blurInput"
-        @select="saveSearch" -->
       <!--v-show="query"： 当搜索框中有内容的时候才显示搜素列表 -->
       <suggest
         ref="suggest"
         :query="query"
         v-show="query"
         @listScroll="blurInput"
+        @select="saveSearch"
       >
       </suggest>
-      <!-- 
     </div>
     <confirm
       ref="confirm"
@@ -79,33 +77,33 @@
       @confirm="clearSearchHistory"
     >
     </confirm>
-    -->
     <!-- 当搜索内容含有歌手的时候，跳转路由，跳到歌手详情页 -->
     <router-view></router-view> 
   </div>
 </template>
 
 <script type="text/ecmascript-6">
-// import { mapActions } from 'vuex'
+import { mapActions,mapGetters } from 'vuex'
 import { getHotKey } from 'api/search'
 import { ERR_OK } from 'api/config'
-// import { playlistMixin, searchMixin } from 'common/js/mixin'
-// import Scroll from 'base/scroll/scroll'
+import { playlistMixin, searchMixin } from 'common/js/mixin'
+import Scroll from 'base/scroll/scroll'
 import SearchBox from 'base/search-box/search-box'
 import Suggest from 'components/suggest/suggest'
-// import SearchList from 'base/search-list/search-list'
-// import Confirm from 'base/confirm/confirm'
+import SearchList from 'base/search-list/search-list'
+import Confirm from 'base/confirm/confirm'
 
 export default {
   // mixins: [playlistMixin, searchMixin],
+  mixins: [playlistMixin],
   components: {
     SearchBox,
-  //   Scroll,
+    Scroll,
     Suggest,
-  //   SearchList,
-  //   Confirm
+    SearchList,
+    Confirm
   },
-  data() {
+  data() { 
     return {
       hotKey: [],
       query: ''
@@ -114,34 +112,52 @@ export default {
   created() {
     this._getHotKey()
   },
-  // computed: {
-  //   shortcut() { // when hotKey | searchHistory changes, scroll reset height
-  //     return this.hotKey.concat(this.searchHistory)
-  //   }
-  // },
+  computed: {
+    ...mapGetters(['searchHistory']),
+    // 为了正确计算scroll高度
+    shortcut() { // when hotKey | searchHistory changes, scroll reset height
+      return this.hotKey.concat(this.searchHistory)
+    }
+  },
   methods: {
     onQueryChange(query){
       this.query = query;
     },
-  //   ...mapActions(['clearSearchHistory']),
-  //   handlePlaylist(playlist) {
-  //     const bottom = playlist.length > 0 ? '60px' : ''
-  //     this.$refs.searchResult.style.bottom = bottom
-  //     this.$refs.suggest.refresh()
-  //     this.$refs.shortcutWrapper.style.bottom = bottom
-  //     this.$refs.shortcut.refresh()
-  //   },
-  //   showConfirm() {
-  //     this.$refs.confirm.show()
-  //   },
+    // ...mapActions(['clearSearchHistory']),
+    ...mapActions(['saveSearchHistory', 'deleteSearchHistory','clearSearchHistory']),
+    handlePlaylist(playlist) {
+      const bottom = playlist.length > 0 ? '60px' : ''
+      this.$refs.searchResult.style.bottom = bottom
+      // 调用suggest中refresh的方法,重新计算scroll高度
+      this.$refs.suggest.refresh()
+      this.$refs.shortcutWrapper.style.bottom = bottom
+      this.$refs.shortcut.refresh()
+    },
+  // 显示提示弹框
+    showConfirm() {
+      this.$refs.confirm.show()
+    },
   // 调用子组件的方法，让输入框失去焦点
     blurInput(){
       this.$refs.searchBox.blur();
     },
+    // 搜索历史
+    saveSearch(){
+      this.saveSearchHistory(this.query);
+    },
+    // 删除某条搜索历史
+    deleteOne(item){
+      this.deleteSearchHistory(item);
+    },
+    // deleteAll(){
+    //   this.clearSearchHistory();
+    // },
+    // 在搜索框中填入内容
     addQuery(query) {
       // 父组件调用子组件的方法，将输入框中的内容设置为指定内容
       this.$refs.searchBox.setQuery(query)
     },
+    // 得到热门搜索内容
     _getHotKey() {
       getHotKey().then(res => {
         if (res.code === ERR_OK) {
@@ -151,15 +167,15 @@ export default {
       })
     }
   },
-  // watch: {
-  //   query(newQuery) { // Prevent current interface from disable scrolle
-  //     if (!newQuery) {
-  //       setTimeout(() => {
-  //         this.$refs.shortcut.refresh()
-  //       }, 20)
-  //     }
-  //   }
-  // }
+  watch: {
+    query(newQuery) { // Prevent current interface from disable scrolle
+      if (!newQuery) {
+        setTimeout(() => {
+          this.$refs.shortcut.refresh()
+        }, 20)
+      }
+    }
+  }
 }
 </script>
 

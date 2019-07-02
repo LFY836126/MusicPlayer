@@ -95,6 +95,7 @@ export default {
       setSinger: 'SET_SINGER'
     }),
     ...mapActions(['insertSong']),
+    // 刷新scroll
     refresh() {
       this.$refs.suggest.refresh()
     },

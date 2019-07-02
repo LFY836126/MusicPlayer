@@ -9,6 +9,7 @@
 
 import { playMode } from 'common/js/config'
 // import { loadSearch, loadPlay, loadFavorite } from 'common/js/cache'
+import { loadSearch } from 'common/js/cache'
 
 const state = {
   singer: {},
@@ -26,8 +27,8 @@ const state = {
   currentIndex: -1,
   disc: {}, // song single object
   topList: {}, // List interface jump interface: the list details interface.
-  // searchHistory: loadSearch(), // loadSearch: Read from the local cache. search-list
-  searchHistory: [],
+  // searchHistory: [],
+  searchHistory: loadSearch(), // loadSearch: Read from the local cache. search-list
   // playHistory: loadPlay(), // loadPlay: Read the search history from the local cache.
   // favoriteList: loadFavorite() // collect list
 }
