@@ -78,45 +78,57 @@ export const randomPlay = function({ commit }, { list }) {
 //  * @param {type}
 //  * @return:
 //  */
-// export const insertSong = function({ commit, state }, song) {
-//   const playlist = state.playlist.slice() // state can't modify unless mutation, copy not modify
-//   const sequenceList = state.sequenceList.slice()
-//   let currentIndex = state.currentIndex // song 2(current song) index
-//   const currentSong = playlist[currentIndex] // song 2 position
-//   const fpIndex = findIndex(playlist, song) // song 1(click search list song) index
-//   currentIndex++ // song 1 position
-//   playlist.splice(currentIndex, 0, song) // song 1 insert song 2 next position
-//   if (fpIndex > -1) { // current playlist has song 1 ?
-//     if (currentIndex > fpIndex) {
-//       playlist.splice(fpIndex, 1) // delete current playlist song 1
-//       currentIndex--
-//     } else {
-//       playlist.splice(fpIndex + 1, 1)
-//     }
-//   }
-//   // song 2 at sequenceList index + 1
-//   const currentSIndex = findIndex(sequenceList, currentSong) + 1
-//   // song 1 at sequenceList index
-//   const fsIndex = findIndex(sequenceList, song)
-//   sequenceList.splice(currentSIndex, 0, song)
-//   if (fsIndex > -1) {
-//     if (currentSIndex > fsIndex) {
-//       sequenceList.splice(fsIndex, 1)
-//     } else {
-//       sequenceList.splice(fsIndex + 1, 1)
-//     }
-//   }
-//   commit(types.SET_PLAYLIST, playlist)
-//   commit(types.SET_SEQUENCE_LIST, sequenceList)
-//   commit(types.SET_CURRENT_INDEX, currentIndex)
-//   commit(types.SET_FULL_SCREEN, true)
-//   commit(types.SET_PLAYING_STATE, true)
-// }
+export const insertSong = function({ commit, state }, song) {
+  const playlist = state.playlist.slice() // state can't modify unless mutation, copy not modify
+  const sequenceList = state.sequenceList.slice()
+  let currentIndex = state.currentIndex // song 2(current song) index
+  // 记录当前歌曲
+  const currentSong = playlist[currentIndex] // song 2 position
+  // 查找当前列表中是否有song这首歌曲，并返回索引
+  const fpIndex = findIndex(playlist, song) // song 1(click search list song) index
+  // 插入歌曲，索引应该+1
+  currentIndex++ // song 1 position
+  // 索引位置插入song
+  playlist.splice(currentIndex, 0, song) // song 1 insert song 2 next position
+  if (fpIndex > -1) { // current playlist has song 1 ?
+    if (currentIndex > fpIndex) {
+      playlist.splice(fpIndex, 1) // delete current playlist song 1
+      currentIndex--
+    } else {
+      playlist.splice(fpIndex + 1, 1)
+    }
+    // 解释是上面一段代码：
+    // let a = [1, 2, 3, 4];
+    // 此时我要插入一个2，那么a = [1, 2, 3, 4, 2]
+    // 所以此时我要删除一个2，也就是前面的，因为后面的2是新添加的
+    // 那么，就是这条语句：playlist.splice(fpIndex, 1)，并且currentIndex--
+    // 此时的a = [1, 3, 4, 2]
+    // 如果此时我在1和3之间添加2的话，我就需要将最后一个2删掉，又因为此时的数组长度已经变长了，所以应该是fpIndex+1的位置
+  }
+  // song 2 at sequenceList index + 1
+  // 找到sequenceList当前应该插入的位置，整体逻辑和playList一样的
+  const currentSIndex = findIndex(sequenceList, currentSong) + 1
+  // song 1 at sequenceList index
+  const fsIndex = findIndex(sequenceList, song)
+  sequenceList.splice(currentSIndex, 0, song)
+  if (fsIndex > -1) {
+    if (currentSIndex > fsIndex) {
+      sequenceList.splice(fsIndex, 1)
+    } else {
+      sequenceList.splice(fsIndex + 1, 1)
+    }
+  }
+  commit(types.SET_PLAYLIST, playlist)
+  commit(types.SET_SEQUENCE_LIST, sequenceList)
+  commit(types.SET_CURRENT_INDEX, currentIndex)
+  commit(types.SET_FULL_SCREEN, true)
+  commit(types.SET_PLAYING_STATE, true)
+}
 
 // // Save to localStorage, saveSearch(call cache.js)
-// export const saveSearchHistory = function({ commit }, query) {
-//   commit(types.SET_SEARCH_HISTORY, saveSearch(query))
-// }
+export const saveSearchHistory = function({ commit }, query) {
+  commit(types.SET_SEARCH_HISTORY, saveSearch(query))
+}
 
 // // Remove the search term from localStorage, deleteSearch(call cache.js)
 // export const deleteSearchHistory = function({ commit }, query) {

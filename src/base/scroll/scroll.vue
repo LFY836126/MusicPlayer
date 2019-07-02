@@ -27,10 +27,12 @@ export default {
       type: Array,
       default: null
     },
+    // 是否开启上拉刷新功能，默认是false
     pullup: { // Pull down to refresh
       type: Boolean,
       default: false
     },
+    // 滚动前，派发的事件
     beforeScroll: { // hide mobile keyboard
       type: Boolean,
       default: false
@@ -68,9 +70,13 @@ export default {
         })
       }
       if (this.pullup) { // pullup: drop-down refresh
+      // console.log('a')
+      // scrollEnd:停止滚动了
+      // scrollToEnd:滚动到底部了
         this.scroll.on('scrollEnd', () => {
           // parent scrollToEnd trigger when the screen is scrolling down 50px
           if (this.scroll.y <= this.scroll.maxScrollY + 50) {
+            //当满足这个条件的时候，表示当前已经滚动到底部了
             this.$emit('scrollToEnd') // scrollToEnd: scroll to bottom
           }
         })

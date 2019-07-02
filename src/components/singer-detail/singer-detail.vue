@@ -47,9 +47,7 @@ export default {
         getSingerDetail(this.singer.id).then(res => {
           if (res.code === ERR_OK) {
             // res.data.list：得到歌手的歌曲列表
-            // console.log(res.data.list);
             this.songs = this._normalizeSongs(res.data.list)
-            // console.log(this.songs);
           }
         })
       },
@@ -74,7 +72,7 @@ export default {
             if (res.code === ERR_OK) {
               const svkey = res.data.items
               const songVkey = svkey[0].vkey
-              console.log(songVkey);
+              // console.log(songVkey);
               const newSong = createSong(musicData, songVkey) // 在这里把vkey和musicData传进去
               // console.log(this.currentSong, this.singer, this.playing, this.fullScreen, this.playlist, this.sequenceList, this.mode, this.currentIndex, this.currentSong);
               ret.push(newSong)

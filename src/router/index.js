@@ -44,6 +44,16 @@ export default new Router({
           }
         ]
       },
-      {path: '/search', component:Search},
+      {
+        path: '/search', 
+        component:Search,
+        children: [
+          {
+          // 以id为变量，可以传入不同的id值，然后去渲染不同的歌手详情页
+          path: ':id',
+          component: SingerDetail,
+          }
+        ]
+      },
   ]
 })

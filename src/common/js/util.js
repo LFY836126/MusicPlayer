@@ -39,6 +39,8 @@ export function shuffle(arr) {
  * @param {Number} delay
  * @return:
  */
+
+// 函数柯里化
 export function debounce(func, delay) {
   let timer
   return function(...args) {

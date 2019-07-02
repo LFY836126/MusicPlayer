@@ -116,7 +116,6 @@ const devWebpackConfig = merge(baseWebpackConfig, {
             console.log(e)
           })
       })
-      
       app.get('/api/getSongList', (req, res) => {
         var url = 'https://c.y.qq.com/qzone/fcg-bin/fcg_ucc_getcdinfo_byids_cp.fcg'
         // Send an HTTP request
@@ -140,6 +139,47 @@ const devWebpackConfig = merge(baseWebpackConfig, {
           .catch((e) => {
             console.log(e)
           })
+      })
+      app.get('/api/getHotKey', (req, res) => {
+        var url = 'https://c.y.qq.com/splcloud/fcgi-bin/gethotkey.fcg'
+        // Send an HTTP request
+        axios
+          .get(url, {
+            // The request to cheat qq
+            headers: {
+              referer: 'https://c.y.qq.com/',
+              host: 'c.y.qq.com'
+            },
+            // params, (recommend.js/getDiscList) pass to url address
+            // params: req.query：获取浏览器请求这个接口传进来的参数
+            params: req.query
+          })
+          .then((response) => {
+            // res: to font-end
+            // response.data: qq response data
+            // 将qq接口返回的response，返回我们定义接口的res(接口的返回数据)中
+            res.json(response.data)
+          })
+          .catch((e) => {
+            console.log(e)
+          })
+      })
+      // 检索列表
+      app.get('/api/searchList', function(req, res) {
+        var url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'  
+        axios.get(url, {
+          headers: {
+            referer: 'https://c.y.qq.com/',
+            host: 'c.y.qq.com'
+          },
+          params: req.query
+        }).then((response) => {
+    
+          res.json(response.data)
+    
+        }).catch((e) => {
+          console.log(e)
+        })
       })
     },
     clientLogLevel: 'warning',
