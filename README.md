@@ -1616,3 +1616,35 @@ package.json                ->添加了
                   }
                 }
         ```
+
+28. 收尾工作
+    + 优化
+        ```
+        1. 当切了很多歌的时候，最后停下来，发现CD和歌词都在继续走
+            原因：
+                在src/components/player.vue中，在监听到当前歌曲改变后，是推迟了1s才播放的
+                 setTimeout(() => {
+                    this.$refs.audio.play()//只写这一句是会报错的，因为调用play时候，我们同时请求src是不可以的，这个dom还没有ready
+                    this.getLyric()
+                  }, 1000)
+                  也就是如果此时我们在这1s之内按了暂停键，1s后这个逻辑还是会执行，所以产生了这样的问题
+            解决：
+                clearTimeout(this.timer)
+                this.timer = setTimeout(() => {
+                    this.$refs.audio.play()//只写这一句是会报错的，因为调用play时候，我们同时请求src是不可以的，这个dom还没有ready
+                    this.getLyric()
+                  }, 1000)
+                同时audio中监听 @play="ready"
+                这样才能保证，先play调用，改变播放状态，然后才能执行audio.pause()方法，也就是pause肯定在play之后执行
+                依旧保留1000延迟是因为，如果歌曲在手机上后台播放，切换到前台的时候，，为了能请求成功，所以设置1s延迟
+        2. 当连续切了很多歌的时候，歌词显示错误
+            原因：歌词获取是异步获取，所以当不停切歌的时候
+                可能这歌词刚请求回来，歌都已经不知道跳了多少个了
+            解决：在player中填入下面语句
+                if (this.currentSong.lyric !== lyric) {
+                    return
+                }
+                当 当前歌词不等于获取来的歌词的时候，就什么都不做，否则才将歌词格式化操作
+        3. 当歌曲列表中只有一首歌的时候，切换下一首，出现 下面样式是都是灰色的
+            解决：当只有一首歌的时候，next或者prev方法 调用loop方法后直接返回，不执行下面的this.songReady = false这条语句
+        ```

@@ -457,9 +457,9 @@ export default {
     },
     getLyric() {
       this.currentSong.getLyric().then(lyric => {
-          // if (this.currentSong.lyric !== lyric) { // prevent fast switch, result in unmatched lyric
-          //   return
-          // }
+          if (this.currentSong.lyric !== lyric) { // prevent fast switch, result in unmatched lyric
+            return
+          }
           // 将歌词格式化，并且歌词改变时，触发this.handleLyric这个方法
           this.currentLyric = new Lyric(lyric, this.handleLyric)
           if (this.playing) {
@@ -603,7 +603,8 @@ export default {
     //     this.getLyric()
     //   })
     // 不用$nextTick，而是用setTimeout，这样就保证了我们微信从后台切到前台的时候，我们的歌曲又可以重新播放了
-    setTimeout(() => {
+    clearTimeout(this.timer)
+    this.timer = setTimeout(() => {
         this.$refs.audio.play()//只写这一句是会报错的，因为调用play时候，我们同时请求src是不可以的，这个dom还没有ready
         this.getLyric()
       }, 1000)
