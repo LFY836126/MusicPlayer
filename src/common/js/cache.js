@@ -83,6 +83,7 @@ export function loadSearch() {
  */
 
 export function savePlay(song) {
+  // 如果有就取出来，没有就=[]
   const songs = storage.get(PLAY_KEY, [])
   insertArray(
     songs,
@@ -92,10 +93,11 @@ export function savePlay(song) {
     },
     PLAY_MAX_LEN
   )
+  // 本地存一份，同时返回
   storage.set(PLAY_KEY, songs)
   return songs
 }
-
+// 外部从本地加载最近播放数组
 export function loadPlay() {
   return storage.get(PLAY_KEY, [])
 }

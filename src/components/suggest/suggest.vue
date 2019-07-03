@@ -115,8 +115,8 @@ export default {
       })
     },
     // 将获取到的数据格式化，得到我们想要的格式
-    _genResult(data) {
-      let ret = []
+    _genResult(data, res) {
+      let ret = res || []
       // type: distinguish singer & song
       // 当有包含检索词的歌手的时候，将zhida中的内容加上type:singer键值对形成一个新的对象加入到ret中
       if (data.zhida && data.zhida.singerid && this.flag) {
@@ -128,36 +128,36 @@ export default {
       // 将包含该检索词的歌曲加入到ret中
       if (data.song) {
         // 将获取到的歌曲数据格式化形成真正的歌曲列表
-        ret = this._normalizeSongs(data.song.list);
+        ret = this._normalizeSongs(ret, data.song.list);
       }
       return ret;
     },
-    _normalizeSongs(list) { // filter
-      const ret = []
-      list.forEach(musicData => {
-        if (musicData.songid && musicData.albummid) {
-          ret.push(createSong(musicData))
-        }
-      })
-      return ret
+    // _normalizeSongs(list) { // filter
+    //   const ret = []
+    //   list.forEach(musicData => {
+    //     if (musicData.songid && musicData.albummid) {
+    //       ret.push(createSong(musicData))
+    //     }
+    //   })
+    //   return ret
+    // },
+   _normalizeSongs(ret, list) {
+    //   let ret = ret;
+      list.forEach((item) => {
+    //     let {musicData} = item
+        if (item.songid && item.albummid) {
+          getMusic(item.songmid).then((res) => { // 这里需要先获取vkey
+            if (res.code === ERR_OK) {
+              const svkey = res.data.items
+              const songVkey = svkey[0].vkey
+              const newSong = createSong(item, songVkey) // 在这里把vkey和musicData传进去
+              ret.push(newSong)
+            }
+          })
+        }
+      })
+      return ret
     },
-  //  _normalizeSongs(list) {
-  //     let ret = []
-  //     list.forEach((item) => {
-  //   //     let {musicData} = item
-  //       if (item.songid && item.albummid) {
-  //         getMusic(item.songmid).then((res) => { // 这里需要先获取vkey
-  //           if (res.code === ERR_OK) {
-  //             const svkey = res.data.items
-  //             const songVkey = svkey[0].vkey
-  //             const newSong = createSong(item, songVkey) // 在这里把vkey和musicData传进去
-  //             ret.push(newSong)
-  //           }
-  //         })
-  //       }
-  //     })
-  //     return ret
-  //   },
     // 当滚动到底部的时候触发该事件，实现上拉刷新
     searchMore() {
       // 如果此时数据已经加载完了，就不能实现上拉刷新的功能了
@@ -168,7 +168,7 @@ export default {
       this.page++
       search(this.query, this.page, this.showSinger, perpage).then(res => {
         if (res.code === ERR_OK) {
-          this.result = this.result.concat(this._genResult(res.data))
+          this.result = this._genResult(res.data, this.result);
           this._checkMore(res.data)
         }
       })

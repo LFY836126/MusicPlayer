@@ -127,13 +127,14 @@
             <i class="icon-mini" :class="miniIcon" @click.stop="togglePlaying"></i>
           </progress-circle>
         </div>
-        <!-- 4.点开歌曲列表的按钮 --> 
-        <div class="control">
+        <!-- 4.点开歌曲列表的按钮，点击触发 显示歌曲列表的 方法,阻止冒泡事件(点击出现播放器页面) --> 
+        <div class="control" @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
-    <!-- <playlist ref="playlist"></playlist> -->
+    <playlist ref="playlist"></playlist>
+
     <!-- 播放歌曲 -->
     <!-- audio会派发事件
     play：当歌曲能播放时候触发该事件
@@ -160,14 +161,14 @@ import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { prefixStyle } from 'common/js/dom'
 import { playMode } from 'common/js/config'
 import { shuffle } from 'common/js/util'
-// import { playerMixin } from 'common/js/mixin'
+import { playerMixin } from 'common/js/mixin'
 import animations from 'create-keyframe-animation'
 // 进度条
 import ProgressBar from 'base/progress-bar/progress-bar'
 import ProgressCircle from 'base/progress-circle/progress-circle'
 import Lyric from 'lyric-parser'
 import Scroll from 'base/scroll/scroll'
-// import Playlist from 'components/playlist/playlist'
+import Playlist from 'components/playlist/playlist'
 
 const transform = prefixStyle('transform')
 const transitionDuration = prefixStyle('transitionDuration')
@@ -177,9 +178,9 @@ export default {
     ProgressBar,
     ProgressCircle,
     Scroll,
-  //   Playlist
+    Playlist
   },
-  // mixins: [playerMixin],
+  mixins: [playerMixin],
   data() {
     return {
       // 记录当前歌曲是否准备好
@@ -227,9 +228,10 @@ export default {
     playIcon() {
       return this.playing ? 'icon-pause' : 'icon-play'
     },
-    iconMode(){
-      return this.mode === playMode.sequence? 'icon-sequence' : this.mode === playMode.loop? 'icon-loop' : 'icon-random'
-    },
+    // iconMode：在mixin中
+    // iconMode(){
+    //   return this.mode === playMode.sequence? 'icon-sequence' : this.mode === playMode.loop? 'icon-loop' : 'icon-random'
+    // },
     miniIcon() {
       return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
     },
@@ -251,7 +253,7 @@ export default {
       setPlayMode: 'SET_PLAY_MODE',
       setPlayList:'SET_PLAYLIST',
     }),
-  //   ...mapActions(['savePlayHistory']),
+    ...mapActions(['savePlayHistory']),
     back() {
       // 不能直接this.fullScreen = false，因为在Vuex中，要通过
       this.setFullScreen(false)
@@ -314,30 +316,25 @@ export default {
         this.currentLyric.togglePlay()
       }
     },
-    changeMode(){
-      const mode = (this.mode + 1) % 3
-      this.setPlayMode(mode)
-      let list = null
-      if(mode === playMode.random){
-        list = shuffle(this.sequenceList)
-      }
-      else{
-        list = this.sequenceList
-      }
-      this.resetCurrentIndex(list);
-      this.setPlayList(list)
-    },
-    resetCurrentIndex(list){
-      let index = list.findIndex((item) => {
-        return item.id === this.currentSong.id
-      })
-      this.setCurrentIndex(index);
-    },
-    // resetCurrentIndex(list) { // when mode change, current song not change
-    //   const index = list.findIndex((item) => {
+    // 下面两个方法在mixin中实现了
+    // changeMode(){
+    //   const mode = (this.mode + 1) % 3
+    //   this.setPlayMode(mode)
+    //   let list = null
+    //   if(mode === playMode.random){
+    //     list = shuffle(this.sequenceList)
+    //   }
+    //   else{
+    //     list = this.sequenceList
+    //   }
+    //   this.resetCurrentIndex(list);
+    //   this.setPlayList(list)
+    // },
+    // resetCurrentIndex(list){
+    //   let index = list.findIndex((item) => {
     //     return item.id === this.currentSong.id
     //   })
-    //   this.setCurrentIndex(index)
+    //   this.setCurrentIndex(index);
     // },
     // 歌曲播放完了，切换
     end() {
@@ -403,9 +400,11 @@ export default {
       }
       this.songReady = false
     },
+    // 歌曲准备好了时候触发该事件
     ready() {
-      this.songReady = true
-      // this.savePlayHistory(this.currentSong)
+      this.songReady = true  
+      // 加入到搜索历史中
+      this.savePlayHistory(this.currentSong)
     },
     error() {
       // 容错处理:当前歌曲播放不出来的话也可以实现点击下一首的功能
@@ -484,9 +483,10 @@ export default {
       // cd封面下面的歌词
       this.playingLyric = txt
     },
-  //   showPlaylist() {
-  //     this.$refs.playlist.show()
-  //   },
+    showPlaylist() {
+      console.log('a');
+      this.$refs.playlist.show()
+    },
     middleTouchStart(e) {
       this.touch.initiated = true
       this.touch.moved = false
@@ -586,6 +586,9 @@ export default {
   },
   watch: {
     currentSong(newSong, oldSong) { // currentSong change, invoked play()
+      if(!newSong.id){
+        return 
+      }
       if (newSong.id === oldSong.id) { // mixin.js/changeMode(), currentSong.id no change currentSong no change
         return
       }

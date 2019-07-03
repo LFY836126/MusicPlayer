@@ -5,13 +5,12 @@
        <!-- @query="onQueryChange" -->
       <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
-    <!--
-      :refreshDelay="refreshDelay" -->
       <!-- v-show="!query"：当前搜索框没有内容的时候显示热门搜索，如果搜索框有内容的时候显示搜索列表 -->
     <div
       class="shortcut-wrapper"
       ref="shortcutWrapper"
        v-show="!query"
+       :refreshDelay="refreshDelay"
     >
       <scroll
         class="shortcut"
@@ -83,7 +82,8 @@
 </template>
 
 <script type="text/ecmascript-6">
-import { mapActions,mapGetters } from 'vuex'
+// mapGetters 在mixin中定义了
+import { mapActions } from 'vuex'
 import { getHotKey } from 'api/search'
 import { ERR_OK } from 'api/config'
 import { playlistMixin, searchMixin } from 'common/js/mixin'
@@ -95,7 +95,7 @@ import Confirm from 'base/confirm/confirm'
 
 export default {
   // mixins: [playlistMixin, searchMixin],
-  mixins: [playlistMixin],
+  mixins: [playlistMixin, searchMixin],
   components: {
     SearchBox,
     Scroll,
@@ -106,25 +106,28 @@ export default {
   data() { 
     return {
       hotKey: [],
-      query: ''
+      // 在mixin中定义了
+      // query: ''
     }
   },
   created() {
     this._getHotKey()
   },
   computed: {
-    ...mapGetters(['searchHistory']),
+    // 在mixin中定义了，直接用就可以
+    // ...mapGetters(['searchHistory']),
     // 为了正确计算scroll高度
     shortcut() { // when hotKey | searchHistory changes, scroll reset height
       return this.hotKey.concat(this.searchHistory)
     }
   },
   methods: {
-    onQueryChange(query){
-      this.query = query;
-    },
-    // ...mapActions(['clearSearchHistory']),
-    ...mapActions(['saveSearchHistory', 'deleteSearchHistory','clearSearchHistory']),
+    // 在mixin中定义了
+    // onQueryChange(query){
+    //   this.query = query;
+    // },
+    // 'saveSearchHistory', 'deleteSearchHistory'：在mixin中定义了
+    ...mapActions(['clearSearchHistory']),
     handlePlaylist(playlist) {
       const bottom = playlist.length > 0 ? '60px' : ''
       this.$refs.searchResult.style.bottom = bottom
@@ -137,14 +140,15 @@ export default {
     showConfirm() {
       this.$refs.confirm.show()
     },
-  // 调用子组件的方法，让输入框失去焦点
-    blurInput(){
-      this.$refs.searchBox.blur();
-    },
-    // 搜索历史
-    saveSearch(){
-      this.saveSearchHistory(this.query);
-    },
+    // 下面这两个方法在mixin中定义了 
+  // // 调用子组件的方法，让输入框失去焦点
+  //   blurInput(){
+  //     this.$refs.searchBox.blur();
+  //   },
+  //   // 搜索历史
+  //   saveSearch(){
+  //     this.saveSearchHistory(this.query);
+  //   },
     // 删除某条搜索历史
     deleteOne(item){
       this.deleteSearchHistory(item);

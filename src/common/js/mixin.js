@@ -73,10 +73,10 @@ export const playerMixin = {
       this.setPlaylist(list)
     },
     resetCurrentIndex(list) { // when mode change, current song not change
-      const index = list.findIndex((item) => {
-        return item.id === this.currentSong.id
-      })
-      this.setCurrentIndex(index)
+      let index = list.findIndex((item) => {
+            return item.id === this.currentSong.id
+          })
+          this.setCurrentIndex(index);
     },
     toggleFavorite(song) {
       if (this.isFavorite(song)) {
@@ -108,6 +108,7 @@ export const searchMixin = {
   data() {
     return {
       query: '',
+      // 设置scroll组件刷新时间
       refreshDelay: 120
     }
   },
@@ -125,6 +126,7 @@ export const searchMixin = {
       this.query = query
     },
     blurInput() {
+      // 带这个refs的，要注意是否在组件中添加引用了
       this.$refs.searchBox.blur()
     },
     addQuery(query) {

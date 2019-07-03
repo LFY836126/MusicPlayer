@@ -8,8 +8,8 @@
  */
 
 import { playMode } from 'common/js/config'
-// import { loadSearch, loadPlay, loadFavorite } from 'common/js/cache'
-import { loadSearch } from 'common/js/cache'
+import { loadSearch, loadPlay, loadFavorite } from 'common/js/cache'
+// import { loadSearch } from 'common/js/cache'
 
 const state = {
   singer: {},
@@ -27,9 +27,10 @@ const state = {
   currentIndex: -1,
   disc: {}, // song single object
   topList: {}, // List interface jump interface: the list details interface.
-  // searchHistory: [],
+  // searchHistory: [],搜索历史I
   searchHistory: loadSearch(), // loadSearch: Read from the local cache. search-list
-  // playHistory: loadPlay(), // loadPlay: Read the search history from the local cache.
+  // 播放历史，从本地缓存中读取
+  playHistory: loadPlay(), // loadPlay: Read the search history from the local cache.
   // favoriteList: loadFavorite() // collect list
 }
 

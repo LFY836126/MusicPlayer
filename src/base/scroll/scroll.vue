@@ -37,6 +37,7 @@ export default {
       type: Boolean,
       default: false
     },
+    // 默认刷新时间是20ms
     refreshDelay: {
       type: Number,
       default: 20
