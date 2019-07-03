@@ -1648,3 +1648,46 @@ package.json                ->添加了
         3. 当歌曲列表中只有一首歌的时候，切换下一首，出现 下面样式是都是灰色的
             解决：当只有一首歌的时候，next或者prev方法 调用loop方法后直接返回，不执行下面的this.songReady = false这条语句
         ```
+29. 环境配置
+    +  在vue-music根目录，新建prod.env.js文件
+        ```
+        1. 引入什么什么的......
+        2. 之前在webpack.dev.conf.js中配置获取数据的接口，都复制到这里
+        3. 配置端口
+            config/index.js
+            build{
+                服务端配置的是8080，我们这里配置为9000
+                port: 9000,
+            }
+        4. 在prod.env.js中监听端口
+            module.exports = app.listen(port, function (err) {
+              if (err) {
+                console.log(err)
+                return
+              }
+              console.log('Listening at http://localhost:' + port + '\n')
+            })
+        5. npm run build
+        6. node prod.server.js
+        ```
+    + 路由懒加载
+        ```
+            因为打包后的文件还是太大，所以利用路由懒加载，节省服务器性能
+        1. 路由懒加载有两种实现方式
+            vue方式：
+                官网：https://router.vuejs.org/zh/guide/advanced/lazy-loading.html
+            webpack2.x方式：
+                官网：https://webpack.js.org/
+        2. 将路由组件都改为异步加载
+        ```
+30. 小技巧
+    + 在移动端如何调试
+        ```
+        1. 因为在移动端不能输出控制台信息，有问题可能看不见，所以安装插件npm i vconsole
+            官网：https://github.com/Tencent/vConsole
+        2. 在main.js中引入
+        ```
+    + 在移动端如何抓包
+        ```
+
+        ```
