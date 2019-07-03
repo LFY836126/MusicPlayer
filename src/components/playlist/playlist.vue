@@ -36,10 +36,9 @@
              <!-- .current：当前歌曲样式 -->
               <i class="current" :class="getCurrentIcon(item)"></i>
               <span class="text">{{item.name}}</span>
-               <!-- @click.stop="toggleFavorite(item)" -->
-              <span class="like">
-                <!-- :class="getFavoriteIcon(item)" -->
-                <i class="icon-not-favorite"></i>
+              <!-- 调用mixin中的方法，完成收藏的功能 -->
+              <span class="like" @click.stop="toggleFavorite(item)">
+                <i :class="getFavoriteIcon(item)"></i>
               </span>
               <span class="delete" @click.stop="deleteOne(item)">
                 <i class="icon-delete"></i>
@@ -145,7 +144,9 @@ export default {
     },
     // 点击歌曲列表中的某首歌曲
     selectItem(item, index) {
-      // 当前遍历的是sequenceList，然而如果是随机模式的话，playList中是被打乱的数组
+      // console.log(this.playlist);
+      // console.log(this.sequenceList);
+      // 当前遍历的是sequenceList，然而如果是随机模式的话，playList中是被打乱的数组,
       // 那么只能通过找到索引，因为歌曲的播放是依赖于数组和索引的，然后通过playList[index]找到歌曲
       if (this.mode === playMode.random) {
         index = this.playlist.findIndex(song => {

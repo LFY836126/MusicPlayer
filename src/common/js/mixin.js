@@ -91,6 +91,7 @@ export const playerMixin = {
       }
       return 'icon-not-favorite'
     },
+    // 判断当前歌曲是否已经在收藏列表中了
     isFavorite(song) {
       const index = this.favoriteList.findIndex((item) => {
         return item.id === song.id

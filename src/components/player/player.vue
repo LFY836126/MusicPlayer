@@ -101,8 +101,14 @@
             <div class="icon i-right" :class="disableCls">
               <i @click="next" class="icon-next"></i>
             </div>
+            <!-- 心形的收藏图标 -->
             <div class="icon i-right">
-              <i class="icon icon-not-favorite"></i>
+              <!-- 
+                getFavoriteIcon
+                toggleFavorite
+                这两个方法都在mixin中定义了，因为playlist中也会使用
+                -->
+              <i class="icon" :class="getFavoriteIcon(currentSong)" @click="toggleFavorite(currentSong)"></i>
             </div>
           </div>
         </div>
@@ -484,7 +490,6 @@ export default {
       this.playingLyric = txt
     },
     showPlaylist() {
-      console.log('a');
       this.$refs.playlist.show()
     },
     middleTouchStart(e) {

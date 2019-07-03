@@ -67,7 +67,7 @@ export const randomPlay = function({ commit }, { list }) {
   commit(types.SET_SEQUENCE_LIST, list) // submit mutation, change the list of song sequences
   // 将list打乱
   const randomList = shuffle(list)
-  commit(types.SET_PLAYLIST, randomList) // change the playlist song
+  commit(types.SET_PLAYLIST, randomList) // change the playlist son
   // 从randomList的第一个开始播放就可以了
   commit(types.SET_CURRENT_INDEX, 0) // click on the current song index
   commit(types.SET_FULL_SCREEN, true) // change to full screen mode
@@ -179,10 +179,10 @@ export const savePlayHistory = function({ commit }, song) {
   commit(types.SET_PLAY_HISTORY, savePlay(song))
 }
 
-// export const saveFavoriteList = function({ commit }, song) {
-//   commit(types.SET_FAVORITE_LIST, saveFavorite(song))
-// }
+export const saveFavoriteList = function({ commit }, song) {
+  commit(types.SET_FAVORITE_LIST, saveFavorite(song))
+}
 
-// export const deleteFavoriteList = function({ commit }, song) {
-//   commit(types.SET_FAVORITE_LIST, deleteFavorite(song))
-// }
+export const deleteFavoriteList = function({ commit }, song) {
+  commit(types.SET_FAVORITE_LIST, deleteFavorite(song))
+}

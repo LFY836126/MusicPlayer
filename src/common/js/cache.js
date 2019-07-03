@@ -41,7 +41,7 @@ function deleteFromArray(arr, compare) {
 }
 
 /**
- * SEARCH_KEY
+ * SEARCH_KEY 搜索列表
  */
 
 export function saveSearch(query) {
@@ -79,7 +79,7 @@ export function loadSearch() {
 }
 
 /**
- * PLAY_KEY
+ * PLAY_KEY 最近播放数组
  */
 
 export function savePlay(song) {
@@ -103,7 +103,7 @@ export function loadPlay() {
 }
 
 /**
- * FAVORITE_KEY
+ * FAVORITE_KEY 收藏数组
  */
 
 export function saveFavorite(song) {

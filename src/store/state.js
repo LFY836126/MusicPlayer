@@ -31,7 +31,8 @@ const state = {
   searchHistory: loadSearch(), // loadSearch: Read from the local cache. search-list
   // 播放历史，从本地缓存中读取
   playHistory: loadPlay(), // loadPlay: Read the search history from the local cache.
-  // favoriteList: loadFavorite() // collect list
+  // 收藏列表
+  favoriteList: loadFavorite() // collect list
 }
 
 export default state
