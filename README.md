@@ -1428,6 +1428,12 @@ package.json                ->添加了
               // 点击完歌曲，同时设置歌曲状态为true
               this.setPlayingState(true)
             },
+        这里注意一个点：
+            playlist正常是和sequenceList中是一样的，如果是随机模式就不一样了
+            如果点歌，必须在随机列表中找这首歌的位置，然后playList[index]才能播放，
+        还有：
+                并不是，随机模式对应歌曲列表中就是随机歌曲列表了
+                只是播放的时候随机播放而已
         5. 当点击歌曲列表的某一首歌之后，也要实现滚动效果，并且，当前播放的歌曲始终在列表的顶部显示
             当监听到当前播放歌曲改变的时候或者当显示这个playlist组件的时候，触发scrollToCurrent事件
              scrollToCurrent(current) {
@@ -1541,3 +1547,72 @@ package.json                ->添加了
             }, 2000)
         ```
     + 突然想起来：有一个函数节流的思想，但是！！ 我忘记在哪用过了，应该是搜索部分，就是以最后一次输入为准
+27. 用户中心页面src/componennts/user-center和收藏功能
+    + 在m-header页面添加路由，点击个人中心图标，进入个人中心页面
+        ```
+        1. src/componennts/m-header中
+            <router-link tag="div" class="mine" to="/user">
+              <i class="icon-mine"></i>
+            </router-link>
+        2. 添加路由，router/index.js
+             {
+                path:'/user',
+                component: UserCenter
+              }
+        ```
+    + 我喜欢的/最近播放
+        ```
+            1. user-center中引入switches组件，并传入两个参数，以便正确显示高亮样式
+                :currentIndex="currentIndex"
+                :switches="switches"
+        ```
+    + 收藏列表：favoriteList
+        ```
+        1. 数据：
+            1)在state中设置变量存储数组
+            2)在mutations，actions，getters等vuex相关的文件，依次添加数据
+            3)在cache.js中创建存储，删除，加载 收藏列表的方法，然后再actions中被使用
+        2. 收藏事件逻辑：(player和playlist)
+            因为逻辑不仅是player中需要的，也是playlist中需要的，所以定义在mixin中
+            <i class="icon" :class="getFavoriteIcon(currentSong)" @click="toggleFavorite(currentSong)"></i>
+                getFavoriteIcon
+                toggleFavorite
+                这两个方法都在mixin中定义了，因为playlist中也会使用
+        3. 在user-center的个人中心，我喜欢的 部分进行渲染数据s
+            和add-song组件一样一样的，照样搬就行，只改了数据就可以了
+        ```
+    + 剩余部分的逻辑user-center
+        ```
+        1. 点击返回，回到来时的页面，也就是主页
+        2. 我喜欢的/最近播放下面的随机播放按钮
+            这里注意：并不是随机播放全部，那个播放列表中就是随机列表了，只是播放的时候是随机的而已
+            而且：在最近播放页面，点击随机播放按钮，歌曲列表排序和最近播放列表排序并不一样，
+                因为，最近播放会利用insertSong将最近播放的排在前面
+        3. 歌曲播放的时候，scroll正确计算高度(利用mixin.js)
+            1)import { playlistMixin } from 'common/js/mixin'
+            2)mixins: [playlistMixin],
+            3)handlePlaylist
+        4. 当我喜欢的/最近播放没有数据，为空的时候，给出提示
+            1)import引入，components注册
+            2)两个计算属性noResult，noResultDesc
+              <!-- 当我喜欢的/最近播放 没有数据，为空的时候，给出提示 -->
+              <div class="no-result-wrapper" v-show="noResult">
+                <!-- noResult：这个组件是否显示 -->
+                <!-- noResultDesc：提示内容 -->
+                <no-result :title="noResultDesc"></no-result>
+              </div>
+               noResult() {
+                  if (this.currentIndex === 0) {
+                    return !this.favoriteList.length
+                  } else {
+                    return !this.playHistory.length
+                  }
+                },
+                noResultDesc() {
+                  if (this.currentIndex === 0) {
+                    return '暂无收藏歌曲'
+                  } else {
+                    return '你还没有听过歌曲'
+                  }
+                }
+        ```
