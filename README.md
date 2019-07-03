@@ -4,15 +4,15 @@
 src:
     ├─api                   ->放置和后端请求相关的代码，包括ajax等
     ├─base
-    │  ├─confirm
+    │  ├─confirm            ->删除时候的提示框，是否真正删除
     │  ├─listview           ->歌手列表的核心组件(singer中使用)
     │  ├─loading            ->等待数据加载时显示的组件(就是一个转圈圈的图案)
-    │  ├─no-result
+    │  ├─no-result          ->搜索结果不存在时候显示的组件
     │  ├─progress-bar       ->播放器页面的进度条
     │  ├─progress-circle    ->mini播放器的播放按钮
     │  ├─scroll             ->用于给组件实现滚动
-    │  ├─search-box
-    │  ├─search-list
+    │  ├─search-box         ->搜索框组件
+    │  ├─search-list        ->根据搜索结果显示的搜索列表
     │  ├─slider             ->轮播图组件
     │  ├─song-list          ->只用于显示所有歌曲(只要获取歌曲就需要这个组件)
     │  ├─switches
@@ -24,21 +24,20 @@ src:
     │  ├─scss
     │  └─stylus
     ├─components            ->公共组件
-    │  ├─add-song
+    │  ├─add-song           ->添加歌曲到队列
     │  ├─disc               ->歌单详情页
     │  ├─m-header           ->首页顶部
     │  ├─music-list         ->歌手详情页主要组件(在singer-detail中被使用)
-    │  
     │  ├─player             ->播放器页面(大的播放器，mini播放器)
-    │  ├─playlist       
-    │  ├─rank
+    │  ├─playlist           ->mini播放器右下角的歌曲列表
+    │  ├─rank               ->所有榜单页面
     │  ├─recommend          ->歌单页面
-    │  ├─search
+    │  ├─search             ->整个搜索页面的实现
     │  ├─singer             ->所有歌手列表页(引用listview)
     │  ├─singer-detail      ->歌手详情页(引用music-list)
-    │  ├─suggest
+    │  ├─suggest            ->搜索页面核心组件，数据获取等
     │  ├─tab                ->导航栏(歌手，排行等)
-    │  ├─top-list
+    │  ├─top-list           ->榜单详情页面
     │  └─user-center
     ├─router                ->路由相关文件
     ├─store                 ->vuex相关代码
@@ -192,6 +191,7 @@ package.json                ->添加了
         1. 引入：import BScroll from 'better-scroll'
         2. 定义相关方法
         3. 在生命周期函数mounted时候执行方法
+        4. 使用scroll的时候一定一定要注意，必须保证当前 能得到组件的正确高度才能滚动！！！！
     ```
     + 轮播图整体功能：
         ```
@@ -1308,6 +1308,10 @@ package.json                ->添加了
                 由scroll.vue组件在滚动前(beforeScroll)派发事件
                 由suggest.vue组件接受来自scroll组件的事件，并传递给父组件search
                 由search接收来自suggest组件的事件，并调用search-box中的事件来使search-box中的搜索框失去焦点，
+        10. 最大的问题：
+            因为getmusic获取vkey需要时间，在没有获到数据的时候，是拿不到返回的歌曲列表的
+            所以在ret.concat(this._normalizeSongs(dta.song.list))是拿不到数据的，就没办法渲染
+            解决：将ret传进去，把之前返回值的初始值(我设置的是[]),直接设置成ret而不是[]
         ```
     + 搜索历史
         ```
@@ -1315,7 +1319,7 @@ package.json                ->添加了
             state,mutation-type, mutations
         2. 在suggest中点击搜索；列表，派发事件(因为每个组件都实现特定的功能，实现功能分离)
         3. 要将结果缓存到localStorage中，所以封装一个单独的js文件src/common/js/cache.js，专门操作localStorage
-            需要安装插件good-storage操作localStorage
+            需要安装插件good-storage操作localStorage，用法见：https://github.com/ustbhuangyi/storage
             因为localStroage存储数据格式什么的很麻烦，这个插件封装了一下，操作简单
             具体见src/common/js/cache.js的saveSearch方法
             saveSearch
@@ -1372,3 +1376,168 @@ package.json                ->添加了
                 mixin配合handlePlaylist
                 见search组件
         ```
+
+25. 歌曲列表组件src/components/playlist.vue，就是一般在右下角那个歌曲列表那个
+    + 在src/components/player.vue中引入
+    + 交互逻辑：
+        ```
+        1. 显示和隐藏
+            <div class="playlist" v-show="showFlag">
+            showFlag默认是false，可以通过shiw和hide这两个方法进行改变
+                show() {
+                  this.showFlag = true
+                },
+                hide() {
+                  this.showFlag = false
+                },
+            显示：点击歌曲列表按钮(src/components/player.vue的control)时触发方法show()
+            隐藏：点击歌曲列表蒙层(.playlist)的时候，或者点击关闭(.list-close)的时候
+                在playlist.vue中的蒙层部分和关闭部分绑定事件，点击就触发hide方法
+                补充：因为蒙层代表的是整个playlist组件，我们要是点击弹出框内容的时候，也会造成playlist组件消失
+                所以在.list-wrapper上添加阻止默认事件@click.stop
+        2. 数据：
+            vuex中导出sequenceList，在dom中遍历
+            当数据很多的时候，要实现滚动效果，引入scroll组件
+            保证获取到所有数据正确的高度，scroll才能正常滚动：当调用show方法的时候，延迟20秒获取数据
+                show() {
+                  this.showFlag = true
+                  // 当点击按钮显示组件的时候，要延迟20秒之后刷新一下scroll，因为这样才能正确的到数据的高度，才能确保滚动
+                  setTimeout(() => {
+                    this.$refs.listContent.refresh()
+                  }, 20)
+        3. 当前歌曲样式
+            遍历的歌曲中如果某一首歌曲和vuex中currentSong匹配上的话，那么这首歌曲设置特殊样式
+            click:
+                getCurrentIcon(item) {
+                  if (this.currentSong.id === item.id) {
+                    return 'icon-play'
+                  }
+                  return ''
+                },
+        4. 切歌
+            如果点击歌曲列表中的某首歌，那么当前播放歌曲要改变，，并且设置歌曲状态改变为true
+            selectItem(item, index) {
+              // 当前遍历的是sequenceList，然而如果是随机模式的话，playList中是被打乱的数组
+              // 那么只能通过找到索引，因为歌曲的播放是依赖于数组和索引的，然后通过playList[index]找到歌曲
+              if (this.mode === playMode.random) {
+                index = this.playlist.findIndex(song => {
+                  return song.id === item.id
+                })
+              }
+              this.setCurrentIndex(index)
+              // 点击完歌曲，同时设置歌曲状态为true
+              this.setPlayingState(true)
+            },
+        5. 当点击歌曲列表的某一首歌之后，也要实现滚动效果，并且，当前播放的歌曲始终在列表的顶部显示
+            当监听到当前播放歌曲改变的时候或者当显示这个playlist组件的时候，触发scrollToCurrent事件
+             scrollToCurrent(current) {
+              // 找到当前播放歌曲对应在sequenceList中的位置
+              const index = this.sequenceList.findIndex(song => {
+                return current.id === song.id
+              }) 
+              // 跳到指定位置
+              // this.$refs.listContent.scrollToElement(this.$refs.list.$el.children[index], 300)
+              this.$refs.listContent.scrollToElement(this.$refs.listItem[index])
+            },
+            watch: {
+                currentSong(newSong, oldSong) {
+                  if (!this.showFlag || newSong.id === oldSong.id) {
+                    return
+                  }
+                  // setTimeout(() => {
+                    this.scrollToCurrent(newSong)
+                  // }, 20)
+                }
+              }
+        6. 点击×的时候，将这首从当前播放列表中删除
+            点击按钮，触发deleteOne事件
+            deleteOne调用actions中的deleteSong事件
+            delteSong：删除playlist，sequenceList中的歌曲，重新计算currentIndex
+            出现问题，当删掉歌曲列表唯一的一首歌时候，报错，
+            因为歌曲改变会触发player的watch
+            watch中：
+                newSong根本没有，所以newSong != oldsong 所以所有逻辑都会执行，所以我们应该当newSong没有的时候，直接返回
+            动画：
+                将ul替换为transition-group
+        7. 点击垃圾桶图标，删除播放列表所有歌曲
+            playlist组件：，
+                使用actions中封装好的方法deleteSongList
+                引用confirm组件
+                注意：要将confirm的点击事件阻止冒泡
+        8. 在player和playlist组件中有很多相同的逻辑，所以将相同的逻辑放在mixin中，实现复用
+            在player和playlist组件中引入mixin
+                import { playerMixin } from 'common/js/mixin'
+                mixins: [playerMixin]
+            然后在提取组件的过程中，在mixin中该引入引入，该配置配置，最后大功告成   
+        ```
+26. 添加歌曲列表页面src/components/add-song
+    + 控制组件的显示或者隐藏
+        ```
+        1. 设置v-show="showflag"
+            showFlag默认是false
+            show和hide可以实现改变showflag的值，控制组件隐藏
+            在playlist组件中点击"添加歌曲......"按钮，触发add-song中的show方法
+            addSong() {
+              this.$refs.addSong.show()
+            }
+            show(){
+
+            }
+        ```
+    + 搜索歌曲
+        ```
+        引用search-box，suggest
+        设置query(搜索框中的关键词)
+        还可以利用query设置最近播放/搜索历史的显示与隐藏
+        注意suggest中是将歌手一起搜索到的，但是我们这里不需要搜索歌手
+            设置变量showSinger(false)并传递给子组件：   suggest组件，
+            <suggest :query="query" :showSinger="showSinger"></suggest>
+        因为这里很多功能很search组件都是I重复的，所以我们定义在mixin中，然后又是一顿大整改，然后就没有然后了
+        ```
+    + 最近播放和搜索历史(src/base/switches)
+        ```
+        1. 切换和样式的改变：
+            (1)由currentIndex控制哪个部分高亮(最近播放/搜索历史)
+                默认是0，代表最近播放，当点击：最近播放/搜索历史，任何一部分的话，都会给父组件add-song派发事件，参数为index
+                由父组件监听事件，改变currentIndex，传入子组件，进而改变哪部分高亮
+        ```
+    + 最近播放和搜索历史列表：(src/components/add-list)
+        ```
+        1. 最近播放部分：
+            (1)player中，audio标签在歌曲准备好的时候就会派发一个ready事件
+                在ready方法中,利用mapActions将当前歌曲加入到最近播放
+                this.savePlayHistory(this.currentSong)
+                mapActions：调用cache.js中的方法将数据存到localStorage中或者从本地取
+            (2)拿到数据之后渲染
+                1)数据利用mapgetters从vuex中取
+                2)组件可滚动：scroll
+                3)数据渲染：song-list组件
+        2. 搜索历史：复用search-list
+            search-list中很多方法和数据都在mixin共享中都
+        ```
+    + 优化
+        ```
+        1. 删除搜索历史的时候添加动画效果src/base/search-list
+            transition-group
+        2. 有时最近播放是不能滚动的src/components/add-song
+            原因：因为scroll没有正确计算高度
+            解决：每次add-song调用show()的时候，都重新计算高度
+        3. 还是发现歌曲列表高度不对
+            原因：监听到数据改变，需要100ms刷新数据，20ms不够
+            解决：改变scroll组件中的刷新的时间，之前是20，是个定值
+                    我们这里改为变量，变量的值默认是20ms，但是可以更改
+            然后在playlist组件中传入值refreshDelay: 120，改变playlist
+            同理 search和add-Song中要改变刷新时间
+            因为这两个组件都用到了mixin，所以I在mixin中设置refreshDelay的值就可以了
+            这个refreshDelay目的就是保证在这个时间内去refresh，我们的高度已经计算出来了
+        ```
+    + 当添加歌曲到歌曲列表的时候，有一个提示框src/base/top-tips
+        ```
+        1. 显示和隐藏，参见add-song的显示和隐藏，一样一样的
+        2. 当点击最近播放中的歌曲，或者搜索结果中歌曲都能触发show方法显示toptip组件
+        3. 几秒自动关闭,或者点击直接隐藏
+            this.timer = setTimeout(() => {
+                this.hide()
+            }, 2000)
+        ```
+    + 突然想起来：有一个函数节流的思想，但是！！ 我忘记在哪用过了，应该是搜索部分，就是以最后一次输入为准
