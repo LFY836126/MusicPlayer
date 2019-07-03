@@ -1,3 +1,4 @@
+// 将所有路由组件改为异步加载
 import Vue from 'vue'
 import Router from 'vue-router'
 import Recommend from 'components/recommend/recommend'
