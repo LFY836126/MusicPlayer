@@ -45,6 +45,7 @@ function deleteFromArray(arr, compare) {
  */
 
 export function saveSearch(query) {
+  // 如果根据key值能取到数据，就将数据赋给searches，如果没有数据，就将[]赋给searches
   const searches = storage.get(SEARCH_KEY, []) // gets cached data, history data, if no data return empty array
   insertArray(
     searches,
@@ -82,6 +83,7 @@ export function loadSearch() {
  * PLAY_KEY 最近播放数组
  */
 
+//  播放历史
 export function savePlay(song) {
   // 如果有就取出来，没有就=[]
   const songs = storage.get(PLAY_KEY, [])

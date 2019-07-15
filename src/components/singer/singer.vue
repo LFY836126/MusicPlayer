@@ -48,7 +48,7 @@ export default {
     },
     // 将数据格式化
     _normalizeSinger(list) {
-      // 定义一个热门数据的数组，包括title和items
+      // 定义一个热门数据的数组，包括title("热门")和items(前十条数据)
       const map = {
         hot: {
           title: HOT_NAME,

@@ -2,6 +2,7 @@
   <!-- ![singer interface](https://i.loli.net/2019/04/08/5caac3c529537.png) -->
   <!-- :data="data": data is async, data change refresh scroll -->
   <scroll class="listview" ref="listview" :data="data"  @scroll="scroll" :listenScroll="listenScroll" :probeType='probeType'>
+    <!-- 歌手列表 -->
     <ul>
       <li class="list-group" ref="listGroup" v-for="(group, index) in data" :key="index">
         <h2 class="list-group-title">{{group.title}}</h2>
@@ -62,6 +63,9 @@ export default {
   },
   created() {
     // 这个touch放在这里，就是为了实现touchmove和touchstart可以同时获取并更改这个值
+    // 为什么不放在data中呢，
+    // 因为vue里面会给data，props以及computed中的值做一个监听，主要是为了和dom做数据绑定的
+    // 而我们这个touch只是为了共享数据，所以，并不用监听，不放在data中
     this.touch = {}
     this.listenScroll = true
     this.probeType = 3
@@ -85,7 +89,7 @@ export default {
     selectItem(item) {
       this.$emit('select', item)
     },
-    // 手指点击触发事件
+    // 手指点击 触发事件
     onShortCutTouchStart(e) {
       // 单独封装一个类getData(src/common/js/dom.js)实现索引的获取
       const anchorIndex = getData(e.target, 'index') // getData(): get index
@@ -100,7 +104,7 @@ export default {
       // 将跳转单独封装成一个方法，因为不仅这里要用，下面的onShortCutTouchMove也要用
       this._scrollTo(anchorIndex)
     },
-    // 手指滑动触发事件
+    // 手指滑动 触发事件
     onShortCutTouchMove(e) {
       // 思路：从touchstart 到 touchmove滚动的位置，计算当前位置和一开始滚动位置的差值data，根据这个data确定滚动到哪
       // firstTouch：实现滑动，需要记录的变量，当前手指现在滑动到的屏幕的位置
@@ -122,7 +126,8 @@ export default {
     // 当有索引值之后，跳转到当前
     _scrollTo(index) {
       // 如果点击字母表上下多出来的部分(ul自带的)，但是没有的地方，直接返回
-      // click on the blank
+      // click on the blank 
+      // index === null
       if (!index && index !== 0) {
         return
       }
@@ -199,6 +204,8 @@ export default {
       }
 
       //第三种情况： when scroll to the bottom
+        //            length - 2    length- 1
+        // [......, 'Z的起始位置','Z的结束位置']
       this.currentIndex = listHeight.length - 2 
     }
   }

@@ -153,6 +153,7 @@ export default {
           return song.id === item.id
         })
       }
+      // 设置state中当前播放歌曲的改变
       this.setCurrentIndex(index)
       // 点击完歌曲，同时设置歌曲状态为true
       this.setPlayingState(true)
@@ -181,6 +182,7 @@ export default {
   },
   watch: {
     currentSong(newSong, oldSong) {
+      // 组件不显示或者歌曲没变
       if (!this.showFlag || newSong.id === oldSong.id) {
         return
       }

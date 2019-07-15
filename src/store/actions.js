@@ -87,7 +87,7 @@ export const insertSong = function({ commit, state }, song) {
   const currentSong = playlist[currentIndex] // song 2 position
   // 查找当前列表中是否有song这首歌曲，并返回索引
   const fpIndex = findIndex(playlist, song) // song 1(click search list song) index
-  // 插入歌曲，索引应该+1
+  // 插入歌曲在当前索引的下一个，索引应该+1
   currentIndex++ // song 1 position
   // 索引位置插入song
   playlist.splice(currentIndex, 0, song) // song 1 insert song 2 next position
@@ -107,15 +107,19 @@ export const insertSong = function({ commit, state }, song) {
     // 如果此时我在1和3之间添加2的话，我就需要将最后一个2删掉，又因为此时的数组长度已经变长了，所以应该是fpIndex+1的位置
   }
   // song 2 at sequenceList index + 1
+
   // 找到sequenceList当前应该插入的位置，整体逻辑和playList一样的
   const currentSIndex = findIndex(sequenceList, currentSong) + 1
-  // song 1 at sequenceList index
+  // 是否含有该插入的这首歌
   const fsIndex = findIndex(sequenceList, song)
+  // 插入歌曲
   sequenceList.splice(currentSIndex, 0, song)
   if (fsIndex > -1) {
+    // 如果现在插入的比之前插入的靠后
     if (currentSIndex > fsIndex) {
       sequenceList.splice(fsIndex, 1)
     } else {
+      // 如果现在插入的比之前插入的靠前
       sequenceList.splice(fsIndex + 1, 1)
     }
   }
@@ -151,7 +155,7 @@ export const deleteSong = function({ commit, state }, song) {
   playlist.splice(pIndex, 1)
   const sIndex = findIndex(sequenceList, song)
   sequenceList.splice(sIndex, 1)
-  // currentIndex === playlist.length:删除的是最后一首歌，因为此时的currentIndex 是 = pindex的
+  // currentIndex === playlist.length:删除的是最后一首歌，此时的currentIndex 是 = pindex的
   if (currentIndex > pIndex || currentIndex === playlist.length) {
     currentIndex--
   }

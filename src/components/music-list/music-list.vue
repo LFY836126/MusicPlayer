@@ -109,10 +109,11 @@ export default {
       this.$refs.list.refresh()
     },
     scroll(pos) {
+      // newVal：整个滑动部分相对于初始位置的偏移
+      //               手指往上滑为负，往下滑为正
+      //               滑动到最底部，pos值为"负值绝对值"最大的时候
       // 获取歌曲列表滚动的距离
-      // pos：手指往上滑，为负，越往上，负数的绝对值越大
-      // 手指向下滑，为正，越往下，正数的绝对值越大
-      // 回到最初的位置，pos为0
+      // pos：整个滑动部分相对于初始位置的偏移，手指往上滑为负，往下滑为正，滑动到最底部s，pos值为"负值绝对值"最大的时候
       this.scrollY = pos.y
     },
     // 点击左上角返回上一级，
@@ -134,6 +135,7 @@ export default {
   },
   watch: {
     scrollY(newVal) {
+      // 设置背景最远滚动这些距离
       const translateY = Math.max(this.minTransalteY, newVal)
       // 设置手指下滑，图片放大的属性
       let scale = 1
@@ -154,11 +156,14 @@ export default {
       // this.$refs.layer.style['webkitTransform'] = `translate3d(0,${translateY}px,0)`
       // css属性，设置模糊
       this.$refs.filter.style[backdrop] = `blur(${blur}px)` // gaussian-blur: iphone view
+
+      // 当手指向上滑动的时候，如果滑动距离超过了图片的一部分高度，那么就通过设置图片的z-index来令图片的一部分在上显示
       if (newVal < this.minTransalteY) { // scroll to top滚动到顶部
         zIndex = 10
         // 因为图片设置的大小是通过width和padding-top实现的宽高比为10:7的，所以要是改变height就要先将paddingTop置为0
         this.$refs.bgImage.style.paddingTop = 0
         this.$refs.bgImage.style.height = `${RESERVED_HEIGHT}px`
+
         // 设置随机播放全部的按钮，在滑动到最顶端时候消失
         this.$refs.playBtn.style.display = 'none'
       } else {
@@ -170,6 +175,7 @@ export default {
       // 设置手指下滑过程中，图片放大的效果
       this.$refs.bgImage.style[transform] = `scale(${scale})`      
       // this.$refs.bgImage.style[webkitTransform] = `scale(${scale})`
+
       // 设置手指下滑或者过程中，图片(上下滑过程中图片高度会改变)始终保持在页面最前面
       this.$refs.bgImage.style.zIndex = zIndex
     }

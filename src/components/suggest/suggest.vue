@@ -172,6 +172,7 @@ export default {
           this._checkMore(res.data)
         }
       })
+      console.log(this.hasMore);
     },
     _checkMore(data) {
       const song = data.song

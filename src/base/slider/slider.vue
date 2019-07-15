@@ -1,5 +1,11 @@
 <template>
   <!-- ![recommend interface](https://i.loli.net/2019/04/06/5ca861da160ba.png) -->
+
+  <!-- 轮播图实现逻辑：举个栗子，比如说5个图片的轮播图
+  屏幕宽度 100px
+  设置子元素宽度：100px
+  设置父元素宽度：100 * 5 + 2 * 100 = 700px
+   -->
   <div class="slider" ref="slider">
     <div class="slider-group" ref="sliderGroup">
       <!-- silder这个插件在components/recommend.vue引入后,silder标签之间的dom在这里slot渲染 -->
@@ -82,7 +88,7 @@ export default {
         const child = this.children[i]
         // 为轮播图每个子元素添加类名，这个添加的方法封装成了一个单独的文件
         addClass(child, 'slider-item') // addClass(): common/js/dom.js
-        // 改变子元素大小
+        // 改变子元素大小为父元素占的屏幕大小
         child.style.width = sliderWidth + 'px'
         width += sliderWidth
       }
@@ -120,7 +126,7 @@ export default {
         // better-scroll and fastclick versus, Clicking on the carousel in mobile mode does not jump
         click: true
       })
-      // 每次在切换下一张图片的时候会触发一个scrollEnd事件
+      // 每次在切换下一张图片的，会触发一个scrollEnd事件
       this.slider.on('scrollEnd', () => { // better-scroll scrollEnd trigger
         let pageIndex = this.slider.getCurrentPage().pageX // pageIndex: stop page index
         // if (this.loop) {
@@ -155,6 +161,7 @@ export default {
     }
   },
   destroyed() { // Clear the timer after the route change
+  // 把定时器等资源进行清理，有利于内存的释放
     clearTimeout(this.timer)
   }
 }

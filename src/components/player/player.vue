@@ -272,7 +272,9 @@ export default {
     enter(el, done) {
       const { x, y, scale } = this._getPosAndScale()
       const animation = {
+        // 大的CD动画初始为0,0,0的位置，scale为1
         0: {
+          // 动画开始的位置和缩放比例
           transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
         },
         60: {
@@ -516,8 +518,10 @@ export default {
         this.touch.moved = true
       }
       // 从这里开始到translate3d那行结束都是在处理移动的距离的逻辑：不懂
+      
       const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
       // page left-scroll distance
+      // 0 > offsetWidth > -window.innerWidth
       const offsetWidth = Math.min(
         0,
         Math.max(-window.innerWidth, left + deltaX)
@@ -577,14 +581,14 @@ export default {
   // 为了实现从大的CD到小的CD动画效果的缩放，要拿到初始的参数，如缩放比例或者位置信息
     _getPosAndScale() {
       const targetWidth = 40 // Small record width
-      const paddingLeft = 40 // Small record paddingLeft，指CD中心点
-      const paddingBottom = 30 // Small record paddingBottom，指CD中心点
-      const paddingTop = 80 // Big record paddingTop
-      const width = window.innerWidth * 0.8 // Big record width
-      const scale = targetWidth / width /*缩放比例*/
-      // 大的CD向左移动的距离
+      const paddingLeft = 40 // Small record paddingLeft，指CD中心点离屏幕左边
+      const paddingBottom = 30 // Small record paddingBottom，指CD中心点离屏幕下面
+      const paddingTop = 80 // Big record paddingTop 大的CD顶部都容器顶部距离
+      const width = window.innerWidth * 0.8 // Big record width 大的CD宽度
+      const scale = targetWidth / width /*缩放比例：大小CD缩放比例 */
+      // 大小中心点水平距离
       const x = -(window.innerWidth / 2 - paddingLeft) // Fourth quadrant, Big record middle point (x, y)
-      // 大的CD向下移动的距离
+      // 大小中心点垂直距离
       const y = window.innerHeight - paddingTop - width / 2 - paddingBottom
       return { x, y, scale }
     }

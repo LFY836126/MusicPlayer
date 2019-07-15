@@ -35,6 +35,7 @@ export function getData(el, name, val) {
   return el.getAttribute(name)
 }
 
+// 添加浏览器前缀
 // Configuration of different browser CSS
 const elementStyle = document.createElement('div').style
 const vendor = (() => {
@@ -60,5 +61,6 @@ export function prefixStyle(style) {
   if (vendor === 'standard') {
     return style
   }
+  // backdrop-filter -> webkitBackdrop-filter
   return vendor + style.charAt(0).toUpperCase() + style.substr(1)
 }

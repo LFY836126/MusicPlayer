@@ -36,8 +36,8 @@ export default {
   computed: {
     ...mapGetters(['topList']),
     title() {
-      // return this.topList.topTitle
-      return 'a'
+      return this.topList.topTitle
+      // return 'a'
     },
     bgImage() {
       // 背景显示第一个歌曲的背景图
