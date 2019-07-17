@@ -1,9 +1,5 @@
 ## 移动端音乐 WebApp
-
-慕课地址: http://coding.imooc.com/class/107.html
 项目笔记：https://blog.csdn.net/LFY836126/article/details/96000712
-
-基于Vue 全家桶 (2.x)制作的移动端音乐 WebApp ，一个媲美原生的移动端音乐 App，项目完整、功能完备、UI美观、交互一流。
 
 ## 技术栈
 
