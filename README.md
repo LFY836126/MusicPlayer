@@ -1,5 +1,5 @@
 ## 移动端音乐 WebApp
-项目笔记：https://blog.csdn.net/LFY836126/article/details/96000712
+项目笔记：[仿QQ音乐WebApp](https://blog.csdn.net/LFY836126/article/details/96000712)
 
 ## 演示一下下~
 + [演示地址](https://lfy836126.github.io/QQmusic/)
