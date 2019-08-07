@@ -2,7 +2,7 @@
 项目笔记：[移动端音乐WebApp](https://blog.csdn.net/LFY836126/article/details/96000712)
 
 ## 演示一下下~
-+ [演示地址](https://lfy836126.github.io/QQmusic/)
++ [演示地址](https://lfy836126.github.io/MusicPlayer/)
 + 注意：在 GitHub Pages 中，通过 jsonp 请求的数据会被正常渲染，而由于无 node 服务，通过 axios 请求的数据不会被正常渲染
 
 ## 技术栈

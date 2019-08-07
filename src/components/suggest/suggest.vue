@@ -79,11 +79,11 @@ export default {
     return {
       // 维护当前检索的是第几页，默认是第一页
       page: 1,
-      // 开启上拉刷新的功能
+      // 开启 上拉刷新的功能
       pullup: true, // drop-down refresh
       // beforeScroll: true,
       // 数据是否已经加载完了，关系到 上拉 是否刷新的到 数据
-      hasMore: true,
+      hasMore: true, 
       // 检索列表
       result: [],
       flag: 1,
