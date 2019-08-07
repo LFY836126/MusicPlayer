@@ -67,8 +67,8 @@ export default {
       if (!this.slider) {
         return
       }
+      // 重新计算宽度
       this._setSliderWidth(true)
-      // 重新计算高度
       this.slider.refresh() // better-scroll: dom change, refresh
     })
   },
@@ -141,7 +141,7 @@ export default {
       })
     },
     _autoPlay() {
-      let pageIndex = this.currentPageIndex + 1 // pageIndex: stop page index + 1, scroll to next page
+      // let pageIndex = this.currentPageIndex + 1 // pageIndex: stop page index + 1, scroll to next page
       this.timer = setTimeout(() => {
         /*
         better-scrol func: goToPage()

@@ -40,7 +40,7 @@ export function shuffle(arr) {
  * @return:
  */
 
-// 函数柯里化
+// 函数防抖
 export function debounce(func, delay) {
   let timer
   return function(...args) {

@@ -65,7 +65,7 @@ export default {
         // scroll中的this默认指向scroll，所以要用一个变量指向vue实例的this
         const that = this
         // 监听scroll的滚动事件，并且拿到位置，也就是事件的回调
-        // pos：整个滑动部分相对于初始位置的偏移，手指往上滑为负，往下滑为正，滑动到最底部s，pos值为"负值绝对值"最大的时候
+        // pos：整个滑动部分相对于初始位置的偏移，手指往上滑为负，往下滑为正，滑动到最底部，pos值为"负值绝对值"最大的时候
         this.scroll.on('scroll', pos => {
           that.$emit('scroll', pos)
         })
