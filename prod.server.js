@@ -149,6 +149,7 @@ apiRoutes.get('/searchList', function(req, res) {
   })
 })
 // copy from build/webpack.dev.conf
+// dist作为资源入口
 app.use('/api', apiRoutes)
 app.use(express.static('./dist'))
 

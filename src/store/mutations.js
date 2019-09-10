@@ -1,11 +1,3 @@
-/*
- * @Description: modify data operation
- * @version:
- * @Author: GanEhank
- * @LastEditors: GanEhank
- * @Date: 2018-06-18 08:12:39
- * @LastEditTime: 2019-04-08 18:33:24
- */
 
 import * as types from './mutation-types'
 

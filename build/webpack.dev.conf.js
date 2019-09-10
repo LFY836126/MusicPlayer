@@ -41,8 +41,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       app.get('/api/getDiscList', (req, res) => {
         var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
         // Send an HTTP request
-        axios
-          .get(url, {
+        axios.get(url, {
             // The request to cheat qq
             headers: {
               referer: 'https://c.y.qq.com/',
@@ -81,8 +80,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       })
       app.get('/api/lyric', (req, res) => {
         let url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg'
-        axios
-          .get(url, {
+        axios.get(url, {
             headers: {
               // The request to cheat qq
               referer: 'https://c.y.qq.com/',

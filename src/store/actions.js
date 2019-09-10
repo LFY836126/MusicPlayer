@@ -1,11 +1,4 @@
-// /*
-//  * @Description: async operate mutations
-//  * @version:
-//  * @Author: GanEhank
-//  * @LastEditors: GanEhank
-//  * @Date: 2018-06-18 08:12:39
-//  * @LastEditTime: 2019-04-10 10:10:16
-//  */
+
 
 import * as types from './mutation-types'
 import { playMode } from 'common/js/config'
@@ -30,13 +23,6 @@ function findIndex(list, song) {
   })
 }
 
-// /**
-//  * Click on song-list to invoked
-//  * @param commit: submit
-//  * @param state: get state data
-//  * @param {list, index} -> **music-list.vue** selectItem(item, index) {}
-//  * @return:
-//  */
 
 // 当点击歌曲的时候，改变state中的几个属性，实现播放歌曲
 // 参数:两个对象：

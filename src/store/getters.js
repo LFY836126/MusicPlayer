@@ -1,11 +1,4 @@
-/*
- * @Description: outside get vuex state data
- * @version:
- * @Author: GanEhank
- * @LastEditors: GanEhank
- * @Date: 2018-06-18 08:12:39
- * @LastEditTime: 2019-04-08 18:32:51
- */
+
 
 export const singer = state => state.singer
 export const playing = state => state.playing

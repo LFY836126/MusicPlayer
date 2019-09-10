@@ -1,7 +1,4 @@
-/**
- * [jsonp query param](https://i.loli.net/2019/04/06/5ca869e167a1c.png)
- * @type {{g_tk: number, inCharset: string, outCharset: string, notice: number, format: string}}
- */
+
 // 配置请求参数中的通用参数
 export const commonParams = {
   g_tk: 5381,

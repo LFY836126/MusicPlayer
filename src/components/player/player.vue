@@ -172,7 +172,7 @@ import animations from 'create-keyframe-animation'
 // 进度条
 import ProgressBar from 'base/progress-bar/progress-bar'
 import ProgressCircle from 'base/progress-circle/progress-circle'
-import Lyric from 'lyric-parser'
+import Lyric from 'lyric-parser'  
 import Scroll from 'base/scroll/scroll'
 import Playlist from 'components/playlist/playlist'
 

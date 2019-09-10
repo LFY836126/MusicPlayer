@@ -1,11 +1,6 @@
 import { commonParams } from './config'
 import axios from 'axios' // ajax axios,request HTTPRequest
 
-/**
- * get Lyric
- * @param {Number} mid
- * @return: Lyric
- */
 // 获取歌词
 export function getLyric(mid) {
   const url = '/api/lyric' // browser accesse address, back-end proxy address
