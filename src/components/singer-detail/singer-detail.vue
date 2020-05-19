@@ -47,6 +47,7 @@ export default {
         getSingerDetail(this.singer.id).then(res => {
           if (res.code === ERR_OK) {
             // res.data.list：得到歌手的歌曲列表
+            // console.log(res.data.list);
             this.songs = this._normalizeSongs(res.data.list)
           }
         })
@@ -69,11 +70,14 @@ export default {
         let {musicData} = item
         if (musicData.songid && musicData.albummid) {
           getMusic(musicData.songmid).then((res) => { // 这里需要先获取vkey
-            if (res.code === ERR_OK) {
-              const svkey = res.data.items
-              const songVkey = svkey[0].vkey
+              if(res.includes('vkey')){
+    //         if (res.code === ERR_OK) {
+    //         console.log(res.data);
+    //           const svkey = res.data.items;
+    //           // console.log(svkey);
+    //           const songVkey = svkey[0].vkey
               // console.log(songVkey);
-              const newSong = createSong(musicData, songVkey) // 在这里把vkey和musicData传进去
+              const newSong = createSong(musicData, res) // 在这里把vkey和musicData传进去
               // console.log(this.currentSong, this.singer, this.playing, this.fullScreen, this.playlist, this.sequenceList, this.mode, this.currentIndex, this.currentSong);
               ret.push(newSong)
               // console.log(this.currentSong, this.singer, this.playing, this.fullScreen, this.playlist, this.sequenceList, this.mode, this.currentIndex, this.currentSong);

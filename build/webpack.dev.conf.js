@@ -63,17 +63,16 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       })
       // 获取vkey
       app.get('/api/music', function(req, res) {
-        var url = 'https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg'  
+        var url = 'https://i.y.qq.com/v8/playsong.html';  
         axios.get(url, {
           headers: {
-            referer: 'https://c.y.qq.com/',
-            host: 'c.y.qq.com'
+            'user-agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+            // 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+            // 'accept-encoding': 'gzip, deflate, br'
           },
           params: req.query
         }).then((response) => {
-    
-          res.json(response.data)
-    
+          res.json(response.data);
         }).catch((e) => {
           console.log(e)
         })
@@ -124,7 +123,6 @@ const devWebpackConfig = merge(baseWebpackConfig, {
               referer: 'https://c.y.qq.com/',
               host: 'c.y.qq.com'
             },
-            // params, (recommend.js/getDiscList) pass to url address
             // params: req.query：获取浏览器请求这个接口传进来的参数
             params: req.query
           })

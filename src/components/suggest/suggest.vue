@@ -147,10 +147,12 @@ export default {
     //     let {musicData} = item
         if (item.songid && item.albummid) {
           getMusic(item.songmid).then((res) => { // 这里需要先获取vkey
-            if (res.code === ERR_OK) {
-              const svkey = res.data.items
-              const songVkey = svkey[0].vkey
-              const newSong = createSong(item, songVkey) // 在这里把vkey和musicData传进去
+          if(res.includes('vkey')){
+    //         if (res.code === ERR_OK) {
+    //           const svkey = res.data.items
+    //           const songVkey = svkey[0].vkey
+    //           const newSong = createSong(item, songVkey) // 在这里把vkey和musicData传进去
+              const newSong = createSong(item, res) // 在这里把vkey和musicData传进去
               ret.push(newSong)
             }
           })

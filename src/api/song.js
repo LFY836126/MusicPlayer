@@ -24,23 +24,22 @@ export function getLyric(mid) {
 // 获取歌曲vkey
 export function getMusic(mid) {
   const url = '/api/music'
-  const data = Object.assign({}, commonParams, {
+  const data = {
     songmid: mid,
-    filename:'C400' + mid +'.m4a',
-    guid:1327051764,
-    platform:'yqq',
-    loginUin:0,
-    hostUin: 0,
-    needNewCode: 0,
-    g_tk:5381,
-    uin:1843,
-    cid:205361747,
-    format: 'json'
-  })
-
+    ADTAG: 'myqq',
+    from: 'myqq',
+    channel: '10007100',
+  }
   return axios.get(url, {
     params: data
   }).then((res) => {
-    return Promise.resolve(res.data)
+    let str = res.data;
+    let index = str.indexOf('src="http://aqqmusic');
+    str = str.slice(index + 5);
+    // console.log(str);
+    let vkeyEndIndex = str.indexOf(' ');
+    str = str.slice(0, vkeyEndIndex - 1);
+    // console.log(str);
+    return Promise.resolve(str)
   })
 }

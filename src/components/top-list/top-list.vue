@@ -68,11 +68,14 @@ export default {
         if (data.songid && data.albummid) {
           // console.log(item);
           getMusic(data.songmid).then((res) => { // 这里需要先获取vkey
-            if (res.code === ERR_OK) {
-              const svkey = res.data.items
-              const songVkey = svkey[0].vkey
+              // console.log(res);
+              if(res.includes('vkey')){
+    //         if (res.code === ERR_OK) {
+    //           const svkey = res.data.items
+    //           const songVkey = svkey[0].vkey
               // console.log(item.songid, item.songmid);
-              const newSong = createSong(data, songVkey) // 在这里把vkey和musicData传进去
+    //           const newSong = createSong(data, songVkey) // 在这里把vkey和musicData传进去
+              const newSong = createSong(data, res) // 在这里把vkey和musicData传进去
               // console.log(newSong);
               // console.log(this.currentSong, this.singer, this.playing, this.fullScreen, this.playlist, this.sequenceList, this.mode, this.currentIndex, this.currentSong);
               ret.push(newSong)
